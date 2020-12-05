@@ -2,15 +2,17 @@
 #define SW_JSON_HPP_
 #include "rw_json.hpp"
 namespace swjson {
-	template<typename _type>
-	static bool json_to_obj(const std::string& str, _type& t, bool isfile = false, bool set_has = false) {
+	template <typename _type>
+	static bool json_to_obj(const std::string &str, _type &t, bool isfile = false, bool set_has = false)
+	{
 		JsonReader reader(str, isfile);
 		reader.convert(nullptr, t);
 		return true;
 	}
 	//“indentCount = 0” 是展开json格式，"indentChar" 作为分割符
 	template <typename _type>
-	static std::string obj_to_json(const _type& data, const std::string& root = "", int indentCount = -1, char indentChar = ' ') {
+	static std::string obj_to_json(const _type &data, const std::string &root = "", int indentCount = -1, char indentChar = ' ')
+	{
 		JsonWriter writer(indentCount, indentChar);
 		writer.convert(root.c_str(), data);
 		return writer.to_json_str();
