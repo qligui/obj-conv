@@ -17,10 +17,10 @@ link_directories(
 
 )
 file(GLOB SW_JSON_LIST_FILES "./sw-json/*.hpp" "./*.cpp")
-aux_source_directory(./sw-json SW_JSON_LIST_FILES)
+aux_source_directory(./sw-protocol SW_PROTOCOL_LIST_FILES)
 aux_source_directory(./ SW_LIST_FILES)
 add_executable(${PROJECT_NAME} 
-    ${SW_JSON_LIST_FILES}
+    ${SW_PROTOCOL_LIST_FILES}
     ${SW_LIST_FILES}
 )
 target_link_libraries(${PROJECT_NAME}

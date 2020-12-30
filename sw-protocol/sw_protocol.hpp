@@ -1,44 +1,69 @@
 #ifndef SW_JSON_HPP_
 #define SW_JSON_HPP_
 #include "rw_json.hpp"
+#include "rw_xml.hpp"
 namespace swjson {
-	template <typename _type>
-	static bool json_to_obj(const std::string &str, _type &t, bool isfile = false, bool set_has = false)
-	{
-		JsonReader reader(str, isfile);
-		reader.convert(nullptr, t);
-		return true;
-	}
-	//“indentCount = 0” 是展开json格式，"indentChar" 作为分割符
-	template <typename _type>
-	static std::string obj_to_json(const _type &data, const std::string &root = "", int indentCount = -1, char indentChar = ' ')
-	{
-		JsonWriter writer(indentCount, indentChar);
-		writer.convert(root.c_str(), data);
-		return writer.to_json_str();
-	}
+    template <typename _type>
+    static bool json_to_obj(const std::string& str, _type& t, bool isfile = false)
+    {
+        JsonReader reader(str, isfile);
+        reader.convert(nullptr, t);
+        return true;
+    }
+    //“indentCount = 0” 是展开json格式，"indentChar" 作为分割符
+    template <typename _type>
+    static std::string obj_to_json(const _type& data, const std::string& root = "", int indentCount = -1, char indentChar = ' ')
+    {
+        JsonWriter writer(indentCount, indentChar);
+        writer.convert(root.c_str(), data);
+        return writer.to_json_str();
+    }
 }//namespace swjson
+namespace swxml {
+    template <typename _type>
+    static bool xml_to_obj(const std::string& str, _type& data, bool isfile = false)
+    {
+        XmlReader reader(str, isfile);
+        reader.convert(nullptr, data);
+        return true;
+    }
+    template <typename _type>
+    static std::string obj_to_xml(const _type& data, const std::string& root = "")
+    {
+        XmlWriter writer;
+        writer.convert(root.c_str(), data);
+        return writer.to_xml_str();
+    }
+    template<typename _type>
+    static bool obj_to_save_xml_file(const char* filename, const _type& data, const std::string& root = "")
+    {
+        XmlWriter writer;
+        writer.convert(root.c_str(), data);
+        return writer.save(filename);
+    }
+}//namespace swxml
 
+//##NAME 前置连接 NAME## 后置连接
 /******************************************Macro Meta Program******************************************/
-#define STRUCT_FUNC_COMMON											\
-public:																\
-    swjson::condition_t cond_t_;									\
-/********************************************json_to_struct*******************************************/
-#define STRUCT_FUNC_TOX_BEGIN										\
-  template<typename _doc>											\
-    void json_to_struct(_doc& obj) {							    
+#define STRUCT_FUNC_COMMON                                          \
+public:                                                             \
+    swjson::condition_t cond_t_;                                    \
+/********************************************protocol_to_struct*******************************************/
+#define STRUCT_FUNC_TOX_BEGIN(FNAME)                                \
+  template<typename _doc>                                           \
+    void FNAME##_to_struct(_doc& obj) {                              
 // 绑定名称
 #define STRUCT_ACT_TOX_O(M)                                         \
         obj.convert(#M, this->M);
 //别名
-#define STRUCT_ACT_TOX_A(M, A_NAME)									\
+#define STRUCT_ACT_TOX_A(M, A_NAME)                                 \
         obj.convert(swjson::alias_name_conversion(#M, A_NAME).c_str(), this->M);
 
-#define STRUCT_FUNC_TOX_END	}
-/*******************************************struct_to_json*********************************************/
-#define STRUCT_FUNC_TOS_BEGIN										\
-    template <typename _obj_type>								    \
-    void struct_to_json(_obj_type& obj, const char *root) const {	
+#define STRUCT_FUNC_TOX_END }
+/*******************************************struct_to_protocol*********************************************/
+#define STRUCT_FUNC_TOS_BEGIN(FNAME)                                \
+    template <typename _obj_type>                                   \
+    void struct_to_##FNAME(_obj_type& obj, const char *root) const {
 // 绑定名称
 #define STRUCT_ACT_TOS_O(M)                                         \
         obj.convert(#M, this->M);
@@ -547,8 +572,18 @@ _9, _8, _7, _6, _5, _4, _3, _2, _1)                            		\
 /*********************************************************************************************************/
 #define SW_JSON(...)\
     STRUCT_FUNC_COMMON\
-    STRUCT_FUNC_TOX_BEGIN STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
-    STRUCT_FUNC_TOS_BEGIN STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
+    STRUCT_FUNC_TOX_BEGIN(json) STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
+    STRUCT_FUNC_TOS_BEGIN(json) STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
 
-#define SW_PROTOCOL(...) SW_JSON(__VA_ARGS__)
+#define SW_XML(...)\
+    STRUCT_FUNC_COMMON\
+    STRUCT_FUNC_TOX_BEGIN(xml) STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
+    STRUCT_FUNC_TOS_BEGIN(xml) STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
+
+#define SW_DB(...)\
+    STRUCT_FUNC_COMMON\
+    STRUCT_FUNC_TOX_BEGIN(db) STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
+    STRUCT_FUNC_TOS_BEGIN(db) STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
+
+#define SW_PROTOCOL(...) SW_XML(__VA_ARGS__)
 #endif
