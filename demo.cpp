@@ -75,8 +75,10 @@ int main(int argc, char* argv[])
     compay.members[0] = User(1, "xxxxx", "xxx@gmail.com");
     compay.members[1] = User(2, "yyyyyy", "yyy@gmail.com");
     compay.person = User(1, "zzzzzz", "zzz@gmail.com");
-    auto xml_str = swxml::obj_to_xml(compay, "config");
-    std::cout << xml_str << std::endl;
+    //auto xml_str = swxml::obj_to_xml(compay, "config");
+    swxml::obj_to_save_xml_file("./example.xml", compay, "config");
+    //std::cout << xml_str << std::endl;
     Company cmpy2;
-    swxml::xml_to_obj(xml_str, cmpy2);
+    swxml::xml_to_obj("./example.xml", cmpy2, false, true);
+    getchar();
 }

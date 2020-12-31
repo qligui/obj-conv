@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.10.0)
+
+project(tinyxml2)
+SET(CMAKE_CXX_COMPILER "/usr/local/gcc/bin/g++")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+
+SET(TINYXML_HEADER_FILES "tinyxml2.h")
+SET(TINYXML_SOURCE_FILES "tinyxml2.cpp")
+
+add_library(${PROJECT_NAME} STATIC ${TINYXML_HEADER_FILES} ${TINYXML_SOURCE_FILES})

@@ -21,25 +21,25 @@ namespace swjson {
 }//namespace swjson
 namespace swxml {
     template <typename _type>
-    static bool xml_to_obj(const std::string& str, _type& data, bool isfile = false)
+    static bool xml_to_obj(const std::string& str, _type& data, bool attribute = false, bool isfile = false)
     {
-        XmlReader reader(str, isfile);
+        XmlReader reader(str, attribute, isfile);
         reader.convert(nullptr, data);
         return true;
     }
     template <typename _type>
-    static std::string obj_to_xml(const _type& data, const std::string& root = "")
+    static std::string obj_to_xml(const _type& data, const std::string& root = "", bool isAttribute = false)
     {
-        XmlWriter writer;
+        XmlWriter writer(isAttribute);
         writer.convert(root.c_str(), data);
         return writer.to_xml_str();
     }
     template<typename _type>
-    static bool obj_to_save_xml_file(const char* filename, const _type& data, const std::string& root = "")
+    static bool obj_to_save_xml_file(const char* filename, const _type& data, const std::string& root = "", bool isAttribute = false)
     {
-        XmlWriter writer;
+        XmlWriter writer(isAttribute);
         writer.convert(root.c_str(), data);
-        return writer.save(filename);
+        return writer.save_xml_file(filename);
     }
 }//namespace swxml
 

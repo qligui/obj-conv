@@ -14,11 +14,15 @@ using namespace tinyxml2;
 using namespace swtraits;
 class RWriter
 {
+public:
+    RWriter() { }
+    RWriter(bool attribute = false) :attribute_(attribute) { }
+    ~RWriter() { }
 protected:
     std::stack<XMLNode*> stack_node_;
     XMLNode* root_;
-    
     const char* key_;
+    bool attribute_;
 
 protected:
     XMLNode* get_current_node()
@@ -50,12 +54,12 @@ protected:
         return node->FirstChildElement(key);
     }
 };
-class XmlReader: public RWriter
+class XmlReader : public RWriter
 {
 private:
     std::unique_ptr<XMLDocument> doc_;
 public:
-    XmlReader(const std::string& str, bool isfile = false) 
+    XmlReader(const std::string& str, bool attribute, bool isfile = false):RWriter(attribute)
     {
         doc_ = std::make_unique<XMLDocument>();
         isfile ? doc_->LoadFile(str.c_str()) : doc_->Parse(str.c_str());
@@ -70,6 +74,7 @@ public:
     void begin_object(const char* key)
     {
         XMLNode* node = get_current_node();
+        auto ddd = doc_->RootElement();
         XMLNode* chlid_node = key == nullptr ? node->LinkEndChild(doc_->RootElement()) : node->FirstChildElement(key);
         stack_node_.push(chlid_node);
     }
@@ -79,7 +84,7 @@ public:
             return;
         stack_node_.pop();
     }
-#define XML_GETVAL(func, ...)                                \
+#define XML_GETVAL(attfunc, textfunc, ...)                   \
         if(nullptr == key){                                  \
             printf("key value empty.\n");                    \
             return false;                                    \
@@ -89,60 +94,74 @@ public:
             printf("key:%s\n, node exist.\n", key);          \
             return true;                                     \
         }                                                    \
-        val = __VA_ARGS__ node->ToElement()->func(key);      \
+        val = __VA_ARGS__ (attribute_ ? node->ToElement()->attfunc(key) : node->FirstChildElement(key)->textfunc());\
         return true;
 
     bool convert(const char* key, std::string& val)
     {
+        //if (nullptr == key) {
+        //    printf("key value empty.\n");
+        //    return false;
+        //}
+        //XMLNode* node = get_current_node();
+        //if (nullptr == node) {
+
+        //    printf("key:%s\n, node exist.\n", key);
+        //    return true;
+        //}
+        //val = (attribute_ ? node->ToElement()->Attribute(key) : node->FirstChildElement(key)->GetText());
+        //return true;
+
         //XMLNode* node = get_current_node();
         //printf("%s\n", node->Value());
         //node->ToElement()->Attribute(key);
         //return true;
-        XML_GETVAL(Attribute);
+        //node->ToElement()->GetText();
+        XML_GETVAL(Attribute, GetText);
     }
     bool convert(const char* key, int8_t& val)
     {
-        XML_GETVAL(IntAttribute, (int8_t));
+        XML_GETVAL(IntAttribute, IntText, (int8_t));
     }
     bool convert(const char* key, uint8_t& val)
     {
-        XML_GETVAL(IntAttribute, (uint8_t));
+        XML_GETVAL(IntAttribute, IntText, (uint8_t));
     }
     bool convert(const char* key, int16_t& val)
     {
-        XML_GETVAL(IntAttribute, (int16_t));
+        XML_GETVAL(IntAttribute, IntText,(int16_t));
     }
     bool convert(const char* key, uint16_t& val)
     {
-        XML_GETVAL(IntAttribute, (uint16_t));
+        XML_GETVAL(IntAttribute, IntText, (uint16_t));
     }
     bool convert(const char* key, int32_t& val)
     {
-        XML_GETVAL(IntAttribute);
+        XML_GETVAL(IntAttribute, IntText);
     }
     bool convert(const char* key, uint32_t& val)
     {
-        XML_GETVAL(UnsignedAttribute);
+        XML_GETVAL(UnsignedAttribute, UnsignedText);
     }
     bool convert(const char* key, int64_t& val)
     {
-        XML_GETVAL(Int64Attribute);
+        XML_GETVAL(Int64Attribute, Int64Text);
     }
     bool convert(const char* key, uint64_t& val)
     {
-        XML_GETVAL(Unsigned64Attribute);
+        XML_GETVAL(Unsigned64Attribute, Unsigned64Text);
     }
     bool convert(const char* key, double& val)
     {
-        XML_GETVAL(DoubleAttribute);
+        XML_GETVAL(DoubleAttribute, DoubleText);
     }
     bool convert(const char* key, float& val)
     {
-        XML_GETVAL(FloatAttribute);
+        XML_GETVAL(FloatAttribute, FloatText);
     }
     bool convert(const char* key, bool& val)
     {
-        XML_GETVAL(BoolAttribute);
+        XML_GETVAL(BoolAttribute, BoolText);
     }
     template<typename _type, typename = typename std::enable_if<std::is_class<_type>::value>::type>
     bool convert(const char* key, std::vector<_type>& val)
@@ -152,7 +171,7 @@ public:
             return false;
         auto num = this->size();
         val.resize(num);
-        for (auto i = 0; i < num ; ++i)
+        for (auto i = 0; i < num; ++i)
         {
             this->convert(key, val[i]);
         }
@@ -161,42 +180,42 @@ public:
     template<typename _type>
     bool convert(const char* key, std::list<_type>& val)
     {
-		XMLNode* node = get_node(key);
-		if (nullptr == node)
-			return false;
-		auto num = this->size();
-		for (int i = 0; i < num; ++i)
-		{
+        XMLNode* node = get_node(key);
+        if (nullptr == node)
+            return false;
+        auto num = this->size();
+        for (int i = 0; i < num; ++i)
+        {
             _type elem;
-			this->convert(key, elem);
+            this->convert(key, elem);
             val.emplace_back(elem);
-		}
-		return true;
+        }
+        return true;
     }
-	template<typename _type>
-	bool convert(const char* key, std::set<_type>& val)
-	{
-		XMLNode* node = get_node(key);
-		if (nullptr == node)
-			return false;
-		auto num = this->size();
-		for (int i = 0; i < num; ++i)
-		{
-			_type elem;
-			this->convert(key, elem);
-			val.insert(elem);
-		}
-		return true;
-	}
-	template<typename _type>
-	bool convert(const char* key, std::shared_ptr<_type>& val)
-	{
-		if (nullptr == val.get())
-		{
-			val.reset(new _type());
-		}
-		return this->convert(key, *val);
-	}
+    template<typename _type>
+    bool convert(const char* key, std::set<_type>& val)
+    {
+        XMLNode* node = get_node(key);
+        if (nullptr == node)
+            return false;
+        auto num = this->size();
+        for (int i = 0; i < num; ++i)
+        {
+            _type elem;
+            this->convert(key, elem);
+            val.insert(elem);
+        }
+        return true;
+    }
+    template<typename _type>
+    bool convert(const char* key, std::shared_ptr<_type>& val)
+    {
+        if (nullptr == val.get())
+        {
+            val.reset(new _type());
+        }
+        return this->convert(key, *val);
+    }
     template<typename _type, typename std::enable_if<has_member_condition_t<_type>::value, int>::type = 0>
     bool convert(const char* key, _type& val)
     {
@@ -218,15 +237,16 @@ class XmlWriter : public RWriter
 {
 private:
     std::unique_ptr<XMLDocument> doc_;
+
 public:
-    XmlWriter()
+    XmlWriter(bool  attribute = false) :RWriter(attribute)
     {
         doc_ = std::make_unique<XMLDocument>();
         const char* declaration = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
         doc_->Parse(declaration);
         push_root(doc_->NewElement(""));
     }
-    ~XmlWriter() 
+    ~XmlWriter()
     {
         pop_root();
     }
@@ -238,11 +258,11 @@ public:
         doc_->Print(&printer);
         return std::string(printer.CStr());
     }
-    bool save(const char* filename)
+    bool save_xml_file(const char* filename)
     {
         if (nullptr == filename)
             return false;
-
+        doc_->LinkEndChild(root_->FirstChild());
         doc_->SaveFile(filename);
         return true;
     }
@@ -261,61 +281,151 @@ public:
     XmlWriter& convert(const char* key, const std::string& val)
     {
         XMLNode* node = get_current_node();
-        node->ToElement()->SetAttribute(key, val.c_str());
+        if (attribute_)
+        {
+            node->ToElement()->SetAttribute(key, val.c_str());
+        }
+        else
+        {
+            XMLElement* element = doc_->NewElement(key);
+            element->SetText(val.c_str());
+            node->InsertEndChild(element);
+        }
         return *this;
     }
     XmlWriter& convert(const char* key, int16_t val)
     {
         XMLNode* node = get_current_node();
-        node->ToElement()->SetAttribute(key, val);
+        if (attribute_)
+        {
+            node->ToElement()->SetAttribute(key, val);
+        }
+        else
+        {
+            XMLElement* element = doc_->NewElement(key);
+            element->SetText(val);
+            node->InsertEndChild(element);
+        }
         return *this;
     }
     XmlWriter& convert(const char* key, uint16_t val)
     {
         XMLNode* node = get_current_node();
-        node->ToElement()->SetAttribute(key, val);
+        if (attribute_)
+        {
+            node->ToElement()->SetAttribute(key, val);
+        }
+        else
+        {
+            XMLElement* element = doc_->NewElement(key);
+            element->SetText(val);
+            node->InsertEndChild(element);
+        }
         return *this;
     }
     XmlWriter& convert(const char* key, int32_t val)
     {
         XMLNode* node = get_current_node();
-        node->ToElement()->SetAttribute(key, val);
+        if (attribute_)
+        {
+            node->ToElement()->SetAttribute(key, val);
+        }
+        else
+        {
+            XMLElement* element = doc_->NewElement(key);
+            element->SetText(val);
+            node->InsertEndChild(element);
+        }
         return *this;
     }
     XmlWriter& convert(const char* key, uint32_t val)
     {
         XMLNode* node = get_current_node();
-        node->ToElement()->SetAttribute(key, val);
+        if (attribute_)
+        {
+            node->ToElement()->SetAttribute(key, val);
+        }
+        else
+        {
+            XMLElement* element = doc_->NewElement(key);
+            element->SetText(val);
+            node->InsertEndChild(element);
+        }
         return *this;
     }
     XmlWriter& convert(const char* key, int64_t val)
     {
         XMLNode* node = get_current_node();
-        node->ToElement()->SetAttribute(key, val);
+        if (attribute_)
+        {
+            node->ToElement()->SetAttribute(key, val);
+        }
+        else
+        {
+            XMLElement* element = doc_->NewElement(key);
+            element->SetText(val);
+            node->InsertEndChild(element);
+        }
         return *this;
     }
     XmlWriter& convert(const char* key, uint64_t val)
     {
         XMLNode* node = get_current_node();
-        node->ToElement()->SetAttribute(key, val);
+        if (attribute_)
+        {
+            node->ToElement()->SetAttribute(key, val);
+        }
+        else
+        {
+            XMLElement* element = doc_->NewElement(key);
+            element->SetText(val);
+            node->InsertEndChild(element);
+        }
         return *this;
     }
     XmlWriter& convert(const char* key, double val)
     {
         XMLNode* node = get_current_node();
-        node->ToElement()->SetAttribute(key, val);
+        if (attribute_)
+        {
+            node->ToElement()->SetAttribute(key, val);
+        }
+        else
+        {
+            XMLElement* element = doc_->NewElement(key);
+            element->SetText(val);
+            node->InsertEndChild(element);
+        }
         return *this;
     }
     XmlWriter& convert(const char* key, float val)
     {
         XMLNode* node = get_current_node();
-        node->ToElement()->SetAttribute(key, val);
+        if (attribute_)
+        {
+            node->ToElement()->SetAttribute(key, val);
+        }
+        else
+        {
+            XMLElement* element = doc_->NewElement(key);
+            element->SetText(val);
+            node->InsertEndChild(element);
+        }
         return *this;
     }
     XmlWriter& convert(const char* key, bool val)
     {
         XMLNode* node = get_current_node();
-        node->ToElement()->SetAttribute(key, val);
+        if (attribute_)
+        {
+            node->ToElement()->SetAttribute(key, val);
+        }
+        else
+        {
+            XMLElement* element = doc_->NewElement(key);
+            element->SetText(val);
+            node->InsertEndChild(element);
+        }
         return *this;
     }
     template<typename _type, typename = typename std::enable_if<std::is_class<_type>::value>::type>
