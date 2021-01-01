@@ -585,5 +585,5 @@ _9, _8, _7, _6, _5, _4, _3, _2, _1)                            		\
     STRUCT_FUNC_TOX_BEGIN(db) STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
     STRUCT_FUNC_TOS_BEGIN(db) STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
 
-#define SW_PROTOCOL(...) SW_XML(__VA_ARGS__)
+#define SW_PROTOCOL(...) SW_XML(__VA_ARGS__) SW_JSON(__VA_ARGS__)
 #endif

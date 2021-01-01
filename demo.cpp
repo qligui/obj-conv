@@ -6,22 +6,23 @@
  *O:建立映射关系
  */
 using namespace std;
-//struct User
-//{
-//    int64_t id;
-//    std::string  name;
-//    std::string  mail;
-//    User(int64_t i = 0, const string& n = "", const string& m = "") :id(i), name(n), mail(m) {}
-//    SW_PROTOCOL(A(id, "card_id"), O(name, mail))
-//};
-//struct Company {
-//    std::string  name;
-//    int64_t master;
-//    std::vector<User> members;
-//    Company() :master(0) {}
-//    SW_PROTOCOL(O(name, master, members))
-//};
-
+struct User
+{
+	int64_t id;
+	std::string  name;
+	std::string  mail;
+	User(int64_t i = 0, const string& n = "", const string& m = "") :id(i), name(n), mail(m) {}
+	SW_XML(A(id, "card_id"), O(name, mail))
+};
+struct Company {
+	std::string  name;
+	int64_t master;
+	std::vector<User> members;
+    User person;
+	Company() :master(0) {}
+	SW_XML(O(name, master, members))
+};
+/*
 struct User
 {
     int64_t id;
@@ -66,6 +67,7 @@ public:
         obj.convert("person", this->person);
     }
 };
+*/
 int main(int argc, char* argv[])
 {
     Company compay;
