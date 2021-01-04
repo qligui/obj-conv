@@ -8,19 +8,19 @@
 using namespace std;
 struct User
 {
-	int64_t id;
-	std::string  name;
-	std::string  mail;
-	User(int64_t i = 0, const string& n = "", const string& m = "") :id(i), name(n), mail(m) {}
-	SW_XML(A(id, "card_id"), O(name, mail))
+    int64_t id;
+    std::string  name;
+    std::string  mail;
+    User(int64_t i = 0, const string& n = "", const string& m = "") :id(i), name(n), mail(m) {}
+    SW_XML(A(id, "card_id"), O(name, mail))
 };
 struct Company {
-	std::string  name;
-	int64_t master;
-	std::vector<User> members;
+    std::string  name;
+    int64_t master;
+    std::vector<User> members;
     User person;
-	Company() :master(0) {}
-	SW_XML(O(name, master, members))
+    Company() :master(0) {}
+    SW_XML(O(name, master, members))
 };
 /*
 struct User
@@ -30,16 +30,16 @@ struct User
     std::string  mail;
     User(int64_t i = 0, const string& n = "", const string& m = "") :id(i), name(n), mail(m) {}
 public:
-    swjson::condition_t cond_t_;
+    swtraits::condition_t cond_t_;
     template<typename _doc> void xml_to_struct(_doc& obj)
     {
-        obj.convert(swjson::alias_name_conversion("id", "card_id").c_str(), this->id);
+        obj.convert(swtraits::alias_name_conversion("id", "card_id").c_str(), this->id);
         obj.convert("name", this->name); obj.convert("mail", this->mail);
     }
     template <typename _obj_type>
     void struct_to_xml(_obj_type& obj, const char* root) const
     {
-        obj.convert(swjson::alias_name_conversion("id", "card_id").c_str(), this->id);
+        obj.convert(swtraits::alias_name_conversion("id", "card_id").c_str(), this->id);
         obj.convert("name", this->name); obj.convert("mail", this->mail);
     }
 };
@@ -50,7 +50,7 @@ struct Company {
     User person;
     Company() :master(0) {}
 public:
-    swjson::condition_t cond_t_;
+    swtraits::condition_t cond_t_;
     template<typename _doc>
     void xml_to_struct(_doc& obj) {
         obj.convert("name", this->name);

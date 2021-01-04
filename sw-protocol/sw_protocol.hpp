@@ -47,7 +47,7 @@ namespace swxml {
 /******************************************Macro Meta Program******************************************/
 #define STRUCT_FUNC_COMMON                                          \
 public:                                                             \
-    swjson::condition_t cond_t_;                                    \
+    swtraits::condition_t cond_t_;                                    \
 /********************************************protocol_to_struct*******************************************/
 #define STRUCT_FUNC_TOX_BEGIN(FNAME)                                \
   template<typename _doc>                                           \
@@ -57,7 +57,7 @@ public:                                                             \
         obj.convert(#M, this->M);
 //别名
 #define STRUCT_ACT_TOX_A(M, A_NAME)                                 \
-        obj.convert(swjson::alias_name_conversion(#M, A_NAME).c_str(), this->M);
+        obj.convert(swtraits::alias_name_conversion(#M, A_NAME).c_str(), this->M);
 
 #define STRUCT_FUNC_TOX_END }
 /*******************************************struct_to_protocol*********************************************/
@@ -69,7 +69,7 @@ public:                                                             \
         obj.convert(#M, this->M);
 //别名
 #define STRUCT_ACT_TOS_A(M, A_NAME)                                 \
-        obj.convert(swjson::alias_name_conversion(#M, A_NAME).c_str(), this->M);
+        obj.convert(swtraits::alias_name_conversion(#M, A_NAME).c_str(), this->M);
 
 #define STRUCT_FUNC_TOS_END	}
 /********************************************macro epand param*****************************************/

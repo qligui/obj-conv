@@ -7,7 +7,6 @@
 #include <tinyxml/tinyxml2.h>
 #include "rw_traits_type.hpp"
 
-
 namespace swxml
 {
 using namespace tinyxml2;
