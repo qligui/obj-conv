@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.10.0)
 
 #SET(CMAKE_CXX_COMPILER "/usr/lib/gcc/x86_64-redhat-linux/10.2.0/bin/g++")
-set(CMAKE_C_COMPILER "/usr/local/gcc/bin/gcc")
-set(CMAKE_CXX_COMPILER "/usr/local/gcc/bin/g++")
+#SET(CMAKE_C_COMPILER "/usr/local/gcc/bin/gcc")
+#SET(CMAKE_CXX_COMPILER "/usr/local/gcc/bin/g++")
 SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
 SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
-set(CMAKE_CXX_FLAGS "-std=c++14 -static-libgcc -static-libstdc++")
+SET(CMAKE_CXX_FLAGS "-std=c++14 -static-libgcc -static-libstdc++")
 project(sw-protocol)
-set(THRID_PARTY_DIR  ${PROJECT_SOURCE_DIR}/thirdparty)
+SET(THRID_PARTY_DIR  ${PROJECT_SOURCE_DIR}/thirdparty)
 include_directories(
 ${THRID_PARTY_DIR}
 ${PROJECT_SOURCE_DIR}
