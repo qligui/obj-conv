@@ -83,17 +83,27 @@ public:
             return;
         stack_node_.pop();
     }
-#define XML_GETVAL(attfunc, textfunc, ...)                   \
-        if(nullptr == key){                                  \
-            printf("key value empty.\n");                    \
-            return false;                                    \
-        }                                                    \
-        XMLNode* node = get_current_node();                  \
-        if(nullptr == node){                                 \
-            printf("key:%s\n, node exist.\n", key);          \
-            return true;                                     \
-        }                                                    \
-        val = __VA_ARGS__ (attribute_ ? node->ToElement()->attfunc(key) : node->FirstChildElement(key)->textfunc());\
+#define XML_GETVAL(attfunc, textfunc, ...)                      \
+        if(nullptr == key){                                     \
+           printf("key value empty.\n");                        \
+           return false;                                        \
+        }                                                       \
+        XMLNode* node = get_current_node();                     \
+        if(nullptr == node){                                    \
+            printf("key attibute :%s,node exist\n", key);       \
+            return true;                                        \
+        }                                                       \
+        if(attribute_){                                         \
+          val = __VA_ARGS__(node->ToElement()->attfunc(key));   \
+        }                                                       \
+        else {                                                  \
+          XMLElement* child_elem = node->FirstChildElement(key);\
+           if(nullptr == child_elem) {                          \
+              printf("key label:%s, node exist.\n", key);       \
+              return true;                                      \
+           }                                                    \
+           val = __VA_ARGS__(child_elem->textfunc());           \
+        }                                                       \
         return true;
 
     bool convert(const char* key, std::string& val)
@@ -104,13 +114,11 @@ public:
         //}
         //XMLNode* node = get_current_node();
         //if (nullptr == node) {
-
         //    printf("key:%s\n, node exist.\n", key);
         //    return true;
         //}
         //val = (attribute_ ? node->ToElement()->Attribute(key) : node->FirstChildElement(key)->GetText());
         //return true;
-
         //XMLNode* node = get_current_node();
         //printf("%s\n", node->Value());
         //node->ToElement()->Attribute(key);
