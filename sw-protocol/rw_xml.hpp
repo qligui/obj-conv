@@ -470,7 +470,7 @@ public:
 
         this->convert(key, *val);
     }
-    template <typename _type>
+    template <typename _type, typename std::enable_if<has_member_condition_t<_type>::value, int>::type = 0>
     void convert(const char* key, const _type& data)
     {
         this->begin_object(key);

@@ -20,7 +20,7 @@ struct Company {
     std::vector<User> members;
     User person;
     Company() :master(0) {}
-    SW_XML(O(name, master, members))
+    SW_XML(O(name, master, members, person))
 };
 /*
 struct User
