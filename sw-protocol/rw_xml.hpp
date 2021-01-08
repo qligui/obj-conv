@@ -223,6 +223,14 @@ public:
         }
         return this->convert(key, *val);
     }
+    template<typename _type, typename = typename std::enable_if<std::is_enum<_type>::value>::type>
+    bool convert(const char* key, _type& enum_val)
+    {
+        typename std::underlying_type<_type>::type val;
+        this->convert(key, val);
+        enum_val = static_cast<_type>(val);
+        return true;
+    }
     template<typename _type, typename std::enable_if<has_member_condition_t<_type>::value, int>::type = 0>
     bool convert(const char* key, _type& val)
     {
@@ -469,6 +477,11 @@ public:
             return;
 
         this->convert(key, *val);
+    }
+    template<typename _type, typename = typename std::enable_if<std::is_enum<_type>::value>::type>
+    void convert(const char* key, const _type& val)
+    {
+        convert(key, static_cast<typename std::underlying_type<_type>::type>(val));
     }
     template <typename _type, typename std::enable_if<has_member_condition_t<_type>::value, int>::type = 0>
     void convert(const char* key, const _type& data)

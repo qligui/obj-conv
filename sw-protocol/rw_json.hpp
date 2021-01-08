@@ -11,6 +11,7 @@
 #include <map>
 #include <set>
 #include <unordered_map>
+#include <algorithm>
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
@@ -123,6 +124,7 @@ public:
         convert(key, str);
         val.resize(str.size());
         val.assign(str.begin(), str.end());
+        return true;
     }
     bool convert(const char* key, std::string& val)
     {
@@ -192,7 +194,11 @@ public:
         }
     }
 
-    template<typename _type, typename = typename std::enable_if<std::is_class<_type>::value>::type>
+#ifdef _MSC_VER
+    template<typename _type, typename = typename std::enable_if<!std::_Is_character<_type>::value>::type>
+#else
+    template<typename _type, typename = typename std::enable_if<!std::__is_char<_type>::value>::type>
+#endif //_MSC_VER
     bool convert(const char* key, std::vector<_type>& val)
     {
         JsonReader doc_val;
@@ -277,6 +283,14 @@ public:
             val.reset(new _type());
         }
         return this->convert(key, *val);
+    }
+    template<typename _type, typename = typename std::enable_if<std::is_enum<_type>::value>::type>
+    bool convert(const char* key, _type& enum_val)
+    {
+        typename std::underlying_type<_type>::type val;
+        this->convert(key, val);
+        enum_val = static_cast<_type>(val);
+        return true;
     }
     template<typename _type, typename std::enable_if<has_member_condition_t<_type>::value, int>::type = 0>
     bool convert(const char* key, _type& val)
@@ -466,7 +480,8 @@ public:
     JsonWriter& convert(const char* key, const std::vector<char>& val)
     {
         std::string str;
-        str.assign(val.begin(), val.end());
+        auto iter = std::find(val.cbegin(), val.cend(), '\0');
+        str.assign(val.begin(), iter);
         return convert(key, str);
     }
     JsonWriter& convert(const char* key, const std::string& val)
@@ -529,7 +544,11 @@ public:
         json_writer_ != nullptr ? json_writer_->Bool(val) : json_pretty_->Bool(val);
         return *this;
     }
-    template<typename _type, typename = typename std::enable_if<std::is_class<_type>::value>::type>
+#ifdef _MSC_VER
+    template<typename _type, typename = typename std::enable_if<!std::_Is_character<_type>::value>::type>
+#else
+    template<typename _type, typename = typename std::enable_if<!std::__is_char<_type>::value>::type>
+#endif //_MSC_VER
     JsonWriter& convert(const char* key, const std::vector<_type>& data)
     {
         data_set_key(key);
@@ -604,8 +623,13 @@ public:
     {
         if (nullptr == val.get())
             return;
-
         this->convert(key, *val);
+    }
+    //增加枚举类型检测:https://stackoverflow.com/questions/9343329/how-to-know-underlying-type-of-class-enum
+    template<typename _type, typename = typename std::enable_if<std::is_enum<_type>::value>::type>
+    JsonWriter& convert(const char* key, const _type& val)
+    {
+        return convert(key, static_cast<typename std::underlying_type<_type>::type>(val));
     }
     template <typename _type, typename std::enable_if<has_member_condition_t<_type>::value, int>::type = 0>
     void convert(const char* key, const _type& data)
