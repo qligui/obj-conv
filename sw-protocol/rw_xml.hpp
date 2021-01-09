@@ -14,8 +14,8 @@ using namespace swtraits;
 class RWriter
 {
 public:
-    RWriter() { }
-    RWriter(bool attribute = false) :attribute_(attribute) { }
+    RWriter() :key_(nullptr), root_(nullptr), attribute_(false) { }
+    RWriter(bool attribute = false) :attribute_(attribute), key_(nullptr), root_(nullptr) { }
     ~RWriter() { }
 protected:
     std::stack<XMLNode*> stack_node_;
