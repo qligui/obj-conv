@@ -1,4 +1,4 @@
-#ifndef RW_JSON_HPP_
+Ôªø#ifndef RW_JSON_HPP_
 #define RW_JSON_HPP_
 
 #ifndef RAPIDJSON_HAS_STDSTRING
@@ -625,7 +625,7 @@ public:
             return;
         this->convert(key, *val);
     }
-    //‘ˆº”√∂æŸ¿‡–ÕºÏ≤‚:https://stackoverflow.com/questions/9343329/how-to-know-underlying-type-of-class-enum
+    //add enum type check:https://stackoverflow.com/questions/9343329/how-to-know-underlying-type-of-class-enum
     template<typename _type, typename = typename std::enable_if<std::is_enum<_type>::value>::type>
     JsonWriter& convert(const char* key, const _type& val)
     {
