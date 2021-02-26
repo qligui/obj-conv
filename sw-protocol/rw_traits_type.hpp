@@ -5,7 +5,7 @@
 namespace swtraits {
 //traits(url:https://izualzhy.cn/SFINAE-and-enable_if)
 template<typename _type>
-struct has_member_condition_t
+struct has_member_condition
 {
     typedef char yes;
     typedef char no[2];
@@ -17,8 +17,6 @@ struct has_member_condition_t
 
     static bool const value = sizeof(check<_type>(0)) == sizeof(yes);
 };
-#define data_for_enum(T)  typename std::enable_if<std::is_enum<T>::value, int>::type
-
 //type
 struct condition_t
 {

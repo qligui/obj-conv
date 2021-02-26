@@ -14,8 +14,8 @@ using namespace swtraits;
 class RWriter
 {
 public:
-    RWriter() :key_(nullptr), root_(nullptr), attribute_(false) { }
-    RWriter(bool attribute = false) :attribute_(attribute), key_(nullptr), root_(nullptr) { }
+    RWriter() { }
+    RWriter(bool attribute = false) :attribute_(attribute) { }
     ~RWriter() { }
 protected:
     std::stack<XMLNode*> stack_node_;
@@ -73,7 +73,6 @@ public:
     void begin_object(const char* key)
     {
         XMLNode* node = get_current_node();
-        auto ddd = doc_->RootElement();
         XMLNode* chlid_node = key == nullptr ? node->LinkEndChild(doc_->RootElement()) : node->FirstChildElement(key);
         stack_node_.push(chlid_node);
     }
@@ -170,7 +169,7 @@ public:
     {
         XML_GETVAL(BoolAttribute, BoolText);
     }
-    template<typename _type, typename = typename std::enable_if<std::is_class<_type>::value>::type>
+    template<typename _type, typename = std::enable_if_t<std::is_class_v<_type>>>
     bool convert(const char* key, std::vector<_type>& val)
     {
         XMLNode* node = get_node(key);
@@ -223,7 +222,7 @@ public:
         }
         return this->convert(key, *val);
     }
-    template<typename _type, typename = typename std::enable_if<std::is_enum<_type>::value>::type>
+    template<typename _type, typename = std::enable_if_t<std::is_enum_v<_type>>>
     bool convert(const char* key, _type& enum_val)
     {
         typename std::underlying_type<_type>::type val;
@@ -231,7 +230,7 @@ public:
         enum_val = static_cast<_type>(val);
         return true;
     }
-    template<typename _type, typename std::enable_if<has_member_condition_t<_type>::value, int>::type = 0>
+    template<typename _type, typename std::enable_if_t<has_member_condition<_type>::value, bool> = true>
     bool convert(const char* key, _type& val)
     {
         begin_object(key);
@@ -443,7 +442,7 @@ public:
         }
         return *this;
     }
-    template<typename _type, typename = typename std::enable_if<std::is_class<_type>::value>::type>
+    template<typename _type, typename = std::enable_if_t<std::is_class_v<_type>>>
     XmlWriter& convert(const char* key, const std::vector<_type>& data)
     {
         for (auto i = 0; i < data.size(); ++i)
@@ -478,12 +477,12 @@ public:
 
         this->convert(key, *val);
     }
-    template<typename _type, typename = typename std::enable_if<std::is_enum<_type>::value>::type>
+    template<typename _type, typename = std::enable_if_t<std::is_enum_v<_type>>>
     void convert(const char* key, const _type& val)
     {
         convert(key, static_cast<typename std::underlying_type<_type>::type>(val));
     }
-    template <typename _type, typename std::enable_if<has_member_condition_t<_type>::value, int>::type = 0>
+    template <typename _type, typename std::enable_if_t<has_member_condition<_type>::value, bool> = true>
     void convert(const char* key, const _type& data)
     {
         this->begin_object(key);

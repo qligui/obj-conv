@@ -4,18 +4,18 @@
 #include "rw_xml.hpp"
 namespace swjson {
     template <typename _type>
-    static bool json_to_obj(const std::string& str, _type& t, bool isfile = false)
+    static bool json_to_obj(const std::string& str, _type& obj, bool isfile = false)
     {
         JsonReader reader(str, isfile);
-        reader.convert(nullptr, t);
+        reader.convert(nullptr, obj);
         return true;
     }
-    //“indentCount = 0” 是展开json格式，"indentChar" 作为分割符
+    //"indentCount = 0"  show json format. "indentChar" show split character
     template <typename _type>
-    static std::string obj_to_json(const _type& data, const std::string& root = "", int indentCount = -1, char indentChar = ' ')
+    static std::string obj_to_json(const _type& obj, const std::string& root = "", int indentCount = -1, char indentChar = ' ')
     {
         JsonWriter writer(indentCount, indentChar);
-        writer.convert(root.c_str(), data);
+        writer.convert(root.c_str(), obj);
         return writer.to_json_str();
     }
 }//namespace swjson
@@ -28,10 +28,10 @@ namespace swxml {
         return true;
     }
     template <typename _type>
-    static std::string obj_to_xml(const _type& data, const std::string& root = "", bool isAttribute = false)
+    static std::string obj_to_xml(const _type& obj, const std::string& root = "", bool isAttribute = false)
     {
         XmlWriter writer(isAttribute);
-        writer.convert(root.c_str(), data);
+        writer.convert(root.c_str(), obj);
         return writer.to_xml_str();
     }
     template<typename _type>
@@ -43,34 +43,32 @@ namespace swxml {
     }
 }//namespace swxml
 
-//##NAME 前置连接 NAME## 后置连接
-/******************************************Macro Meta Program******************************************/
+//"##NAME" as front join. "NAME##" as back json
+/******************************************Macro Meta Program*****************************************/
 #define STRUCT_FUNC_COMMON                                          \
 public:                                                             \
-    swtraits::condition_t cond_t_;                                    \
-/********************************************protocol_to_struct*******************************************/
+    swtraits::condition_t cond_t_;                                  \
+/********************************************protocol_to_struct***************************************/
 #define STRUCT_FUNC_TOX_BEGIN(FNAME)                                \
   template<typename _doc>                                           \
     void FNAME##_to_struct(_doc& obj) {                              
-// 绑定名称
+//bind variable name
 #define STRUCT_ACT_TOX_O(M)                                         \
         obj.convert(#M, this->M);
-//别名
+//alias variable name
 #define STRUCT_ACT_TOX_A(M, A_NAME)                                 \
         obj.convert(swtraits::alias_name_conversion(#M, A_NAME).c_str(), this->M);
-
 #define STRUCT_FUNC_TOX_END }
-/*******************************************struct_to_protocol*********************************************/
+/*******************************************struct_to_protocol****************************************/
 #define STRUCT_FUNC_TOS_BEGIN(FNAME)                                \
     template <typename _obj_type>                                   \
     void struct_to_##FNAME(_obj_type& obj, const char *root) const {
-// 绑定名称
+//bind variable name
 #define STRUCT_ACT_TOS_O(M)                                         \
         obj.convert(#M, this->M);
-//别名
+//alias variable name
 #define STRUCT_ACT_TOS_A(M, A_NAME)                                 \
         obj.convert(swtraits::alias_name_conversion(#M, A_NAME).c_str(), this->M);
-
 #define STRUCT_FUNC_TOS_END	}
 /********************************************macro epand param*****************************************/
 /*#define PARAM_SLOT_POS                                            \
@@ -101,10 +99,10 @@ _9,_8,_7,_6,_5,_4,_3,_2,_1, N,...) LEVEL##N
 
 #define STRUCT_L1_TOX(x) STRUCT_L1_TOX_##x
 #define STRUCT_L1_TOS(x) STRUCT_L1_TOS_##x
-//string to obj
+//string(binary) to obj
 #define STRUCT_L1_TOX_O(...)  STRUCT_N2(STRUCT_L2, STRUCT_ACT_TOX_O, __VA_ARGS__)
 #define STRUCT_L1_TOX_A(M,A)  STRUCT_ACT_TOX_A(M, A)
-//obj to string
+//obj to string(binary)
 #define  STRUCT_L1_TOS_O(...) STRUCT_N2(STRUCT_L2, STRUCT_ACT_TOS_O, __VA_ARGS__)
 #define  STRUCT_L1_TOS_A(M, A) STRUCT_ACT_TOS_A(M,A)
 
@@ -137,7 +135,7 @@ _19, _18, _17, _16, _15, _14, _13, _12, _11, _10,                   \
 _9, _8, _7, _6, _5, _4, _3, _2, _1))                                \
 STRUCT_EXPAND((ACTION, __VA_ARGS__))
 //question: https://stackoverflow.com/questions/5134523/msvc-doesnt-expand-va-args-correctly
-#define STRUCT_L1_DEF(ACT, M)      ACT(M) // here will expand to ACT(O(xxx)), ACT(A(a,x)), ACT(M(xxx))
+#define STRUCT_L1_DEF(ACT, M)      ACT(M) // here will expand to ACT(O(xxx)), ACT(A(a,x))
 #define STRUCT_L1_1(ACT, M)        STRUCT_L1_DEF(ACT, M)
 #define STRUCT_L1_2(ACT, M,...)    STRUCT_L1_DEF(ACT, M)      STRUCT_L1_1 STRUCT_EXPAND((ACT, __VA_ARGS__))
 #define STRUCT_L1_3(ACT, M,...)    STRUCT_L1_DEF(ACT, M)      STRUCT_L1_2 STRUCT_EXPAND((ACT, __VA_ARGS__))
@@ -340,7 +338,7 @@ STRUCT_EXPAND((ACTION, __VA_ARGS__))
 #define STRUCT_L2_99(ACT, M,...)  STRUCT_L2_DEF(ACT, M)     STRUCT_L2_98 STRUCT_EXPAND((ACT, __VA_ARGS__))
 #else
 #define STRUCT_N(LEVEL, ACTION, ...)                                \
-STRUCT_COUNT(LEVEL, ACTION, __VA_ARGS__,              				\
+STRUCT_COUNT(LEVEL, ACTION, __VA_ARGS__,                            \
 _99, _98, _97, _96, _95, _94, _93, _92, _91, _90,                   \
 _89, _88, _87, _86, _85, _84, _83, _82, _81, _80,                   \
 _79, _78, _77, _76, _75, _74, _73, _72, _71, _70,                   \
@@ -354,7 +352,7 @@ _9, _8, _7, _6, _5, _4, _3, _2, _1)                                 \
 (ACTION, __VA_ARGS__)
 
 #define STRUCT_N2(LEVEL, ACTION, ...)                               \
-STRUCT_COUNT(LEVEL, ACTION, __VA_ARGS__,              				\
+STRUCT_COUNT(LEVEL, ACTION, __VA_ARGS__,                            \
 _99, _98, _97, _96, _95, _94, _93, _92, _91, _90,                   \
 _89, _88, _87, _86, _85, _84, _83, _82, _81, _80,                   \
 _79, _78, _77, _76, _75, _74, _73, _72, _71, _70,                   \
@@ -364,7 +362,7 @@ _49, _48, _47, _46, _45, _44, _43, _42, _41, _40,                   \
 _39, _38, _37, _36, _35, _34, _33, _32, _31, _30,                   \
 _29, _28, _27, _26, _25, _24, _23, _22, _21, _20,                   \
 _19, _18, _17, _16, _15, _14, _13, _12, _11, _10,                   \
-_9, _8, _7, _6, _5, _4, _3, _2, _1)                            		\
+_9, _8, _7, _6, _5, _4, _3, _2, _1)                                 \
 (ACTION, __VA_ARGS__)
 
 #define STRUCT_L1_DEF(ACT, M)      ACT(M) // here will expand to ACT(O(xxx)), ACT(A(a,x)), ACT(M(xxx))
@@ -584,6 +582,4 @@ _9, _8, _7, _6, _5, _4, _3, _2, _1)                            		\
     STRUCT_FUNC_COMMON\
     STRUCT_FUNC_TOX_BEGIN(db) STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
     STRUCT_FUNC_TOS_BEGIN(db) STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
-
-#define SW_PROTOCOL(...) SW_XML(__VA_ARGS__) SW_JSON(__VA_ARGS__)
 #endif

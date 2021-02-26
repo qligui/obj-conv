@@ -193,11 +193,18 @@ public:
             return false;
         }
     }
-
+    template<typename _type, typename = std::enable_if_t<std::is_enum_v<_type>>>
+    bool convert(const char* key, _type& enum_val)
+    {
+        typename std::underlying_type<_type>::type val;
+        this->convert(key, val);
+        enum_val = static_cast<_type>(val);
+        return true;
+    }
 #ifdef _MSC_VER
-    template<typename _type, typename = typename std::enable_if<!std::_Is_character<_type>::value>::type>
+    template<typename _type, typename = std::enable_if_t<!std::_Is_character<_type>::value>>
 #else
-    template<typename _type, typename = typename std::enable_if<!std::__is_char<_type>::value>::type>
+    template<typename _type, typename = std::enable_if_t<!std::__is_char<_type>::value>>
 #endif //_MSC_VER
     bool convert(const char* key, std::vector<_type>& val)
     {
@@ -284,15 +291,7 @@ public:
         }
         return this->convert(key, *val);
     }
-    template<typename _type, typename = typename std::enable_if<std::is_enum<_type>::value>::type>
-    bool convert(const char* key, _type& enum_val)
-    {
-        typename std::underlying_type<_type>::type val;
-        this->convert(key, val);
-        enum_val = static_cast<_type>(val);
-        return true;
-    }
-    template<typename _type, typename std::enable_if<has_member_condition_t<_type>::value, int>::type = 0>
+    template<typename _type, std::enable_if_t<has_member_condition<_type>::value, bool> = true>
     bool convert(const char* key, _type& val)
     {
         JsonReader doc_val;
@@ -544,10 +543,16 @@ public:
         json_writer_ != nullptr ? json_writer_->Bool(val) : json_pretty_->Bool(val);
         return *this;
     }
+    //add enum tpye check:https://stackoverflow.com/questions/9343329/how-to-know-underlying-type-of-class-enum
+    template<typename _type, typename = typename std::enable_if_t<std::is_enum_v<_type>>>
+    JsonWriter& convert(const char* key, const _type& val)
+    {
+        return convert(key, static_cast<typename std::underlying_type<_type>::type>(val));
+    }
 #ifdef _MSC_VER
-    template<typename _type, typename = typename std::enable_if<!std::_Is_character<_type>::value>::type>
+    template<typename _type, typename = typename std::enable_if_t<!std::_Is_character<_type>::value>>
 #else
-    template<typename _type, typename = typename std::enable_if<!std::__is_char<_type>::value>::type>
+    template<typename _type, typename = typename std::enable_if_t<!std::__is_char<_type>::value>>
 #endif //_MSC_VER
     JsonWriter& convert(const char* key, const std::vector<_type>& data)
     {
@@ -625,13 +630,7 @@ public:
             return;
         this->convert(key, *val);
     }
-    //add enum type check:https://stackoverflow.com/questions/9343329/how-to-know-underlying-type-of-class-enum
-    template<typename _type, typename = typename std::enable_if<std::is_enum<_type>::value>::type>
-    JsonWriter& convert(const char* key, const _type& val)
-    {
-        return convert(key, static_cast<typename std::underlying_type<_type>::type>(val));
-    }
-    template <typename _type, typename std::enable_if<has_member_condition_t<_type>::value, int>::type = 0>
+    template <typename _type, std::enable_if_t<has_member_condition<_type>::value, bool> = true>
     void convert(const char* key, const _type& data)
     {
         data_set_key(key);
