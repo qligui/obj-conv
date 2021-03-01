@@ -442,6 +442,11 @@ public:
         }
         return *this;
     }
+	template<typename _type, typename = std::enable_if_t<std::is_enum_v<_type>>>
+	void convert(const char* key, const _type& val)
+	{
+		convert(key, static_cast<typename std::underlying_type<_type>::type>(val));
+	}
     template<typename _type, typename = std::enable_if_t<std::is_class_v<_type>>>
     XmlWriter& convert(const char* key, const std::vector<_type>& data)
     {
@@ -476,11 +481,6 @@ public:
             return;
 
         this->convert(key, *val);
-    }
-    template<typename _type, typename = std::enable_if_t<std::is_enum_v<_type>>>
-    void convert(const char* key, const _type& val)
-    {
-        convert(key, static_cast<typename std::underlying_type<_type>::type>(val));
     }
     template <typename _type, typename std::enable_if_t<has_member_condition<_type>::value, bool> = true>
     void convert(const char* key, const _type& data)

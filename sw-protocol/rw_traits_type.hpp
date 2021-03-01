@@ -3,7 +3,7 @@
 #include <type_traits>
 
 namespace swtraits {
-//traits(url:https://izualzhy.cn/SFINAE-and-enable_if)
+/* c++11 before implement:traits(url:https://izualzhy.cn/SFINAE-and-enable_if)
 template<typename _type>
 struct has_member_condition
 {
@@ -17,6 +17,13 @@ struct has_member_condition
 
     static bool const value = sizeof(check<_type>(0)) == sizeof(yes);
 };
+*/
+//C++17 implement
+template<typename, typename=std::void_t<>>
+struct has_member_condition : std::false_type{ };
+template<typename _type>
+struct has_member_condition<_type, std::void_t<decltype(&_type::cond_t_)>> : std::true_type{ };
+
 //type
 struct condition_t
 {
@@ -31,11 +38,6 @@ struct condition_t
         parent_ = p;
         cond_func_ = func;
     }
-};
-template<typename _type>
-class DataType :public _type {
-public:
-    condition_t cond_t_;
 };
 
 static std::string alias_name_conversion(const std::string& key, const std::string& alias_name)
