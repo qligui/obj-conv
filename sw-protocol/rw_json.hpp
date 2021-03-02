@@ -201,11 +201,7 @@ public:
         enum_val = static_cast<_type>(val);
         return true;
     }
-#ifdef _MSC_VER
-    template<typename _type, typename = std::enable_if_t<!std::_Is_character<_type>::value>>
-#else
-    template<typename _type, typename = std::enable_if_t<!std::__is_char<_type>::value>>
-#endif //_MSC_VER
+    template<typename _type, typename = std::enable_if_t<!std::is_same_v<_type, char>>>
     bool convert(const char* key, std::vector<_type>& val)
     {
         JsonReader doc_val;
@@ -549,11 +545,7 @@ public:
     {
         return convert(key, static_cast<typename std::underlying_type<_type>::type>(val));
     }
-#ifdef _MSC_VER
-    template<typename _type, typename = typename std::enable_if_t<!std::_Is_character<_type>::value>>
-#else
-    template<typename _type, typename = typename std::enable_if_t<!std::__is_char<_type>::value>>
-#endif //_MSC_VER
+    template<typename _type, typename = std::enable_if_t<!std::is_same_v<_type, char>>>
     JsonWriter& convert(const char* key, const std::vector<_type>& data)
     {
         data_set_key(key);
