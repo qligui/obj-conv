@@ -21,25 +21,25 @@
     <ClInclude Include="..\..\thirdparty\tinyxml\tinyxml2.h">
       <Filter>头文件\tinyxml</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sw-protocol\rw_json.hpp">
+    <ClInclude Include="..\..\reflex_format\reflex_format.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sw-protocol\rw_traits_type.hpp">
+    <ClInclude Include="..\..\reflex_format\rw_json.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sw-protocol\rw_xml.hpp">
+    <ClInclude Include="..\..\reflex_format\rw_traits_type.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sw-protocol\sw_protocol.hpp">
+    <ClInclude Include="..\..\reflex_format\rw_xml.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\demo.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\thirdparty\tinyxml\tinyxml2.cpp">
       <Filter>头文件\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

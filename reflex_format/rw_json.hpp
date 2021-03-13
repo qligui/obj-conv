@@ -17,8 +17,8 @@
 #include <rapidjson/stringbuffer.h>
 #include "rw_traits_type.hpp"
 
-namespace swjson {
-using namespace swtraits;
+namespace reflexjson {
+using namespace reflextraits;
 
 template<typename _doc>
 class Reader
@@ -299,7 +299,7 @@ public:
         size_t len = obj->size();
         if (len <= 1)
         {
-            val.json_to_struct(*obj);
+            val.obj_to_struct(*obj);
             bret = true;
         }
         else if (nullptr == val.cond_t_.cond_func_)
@@ -312,7 +312,7 @@ public:
                 JsonReader sub = (*obj)[i];
                 if (val.cond_t_.cond_func_(val.cond_t_.parent_, (void*)&sub))
                 {
-                    val.json_to_struct(sub);
+                    val.obj_to_struct(sub);
                     bret = true;
                     break;
                 }
@@ -627,9 +627,9 @@ public:
     {
         data_set_key(key);
         this->object_begin();
-        data.struct_to_json(*this, key);
+        data.struct_to_obj(*this, key);
         this->object_end();
     }
 };
 }
-#endif
+#endif//RW_JSON_HPP_

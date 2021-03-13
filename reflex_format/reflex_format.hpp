@@ -1,8 +1,9 @@
-#ifndef SW_JSON_HPP_
-#define SW_JSON_HPP_
+#ifndef REFLEX_FORMAT_HPP
+#define REFLEX_FORMAT_HPP
+
 #include "rw_json.hpp"
 #include "rw_xml.hpp"
-namespace swjson {
+namespace reflexjson {
     template <typename _type>
     static bool json_to_obj(const std::string& str, _type& obj, bool isfile = false)
     {
@@ -18,36 +19,36 @@ namespace swjson {
         writer.convert(root.c_str(), obj);
         return writer.to_json_str();
     }
-}//namespace swjson
-namespace swxml {
-    template <typename _type>
-    static bool xml_to_obj(const std::string& str, _type& data, bool attribute = false, bool isfile = false)
-    {
-        XmlReader reader(str, attribute, isfile);
-        reader.convert(nullptr, data);
-        return true;
-    }
-    template <typename _type>
-    static std::string obj_to_xml(const _type& obj, const std::string& root = "", bool isAttribute = false)
-    {
-        XmlWriter writer(isAttribute);
-        writer.convert(root.c_str(), obj);
-        return writer.to_xml_str();
-    }
-    template<typename _type>
-    static bool obj_to_save_xml_file(const char* filename, const _type& data, const std::string& root = "", bool isAttribute = false)
-    {
-        XmlWriter writer(isAttribute);
-        writer.convert(root.c_str(), data);
-        return writer.save_xml_file(filename);
-    }
-}//namespace swxml
+}//namespace reflexjson
+namespace reflexxml {
+	template <typename _type>
+	static bool xml_to_obj(const std::string& str, _type& data, bool attribute = false, bool isfile = false)
+	{
+		XmlReader reader(str, attribute, isfile);
+		reader.convert(nullptr, data);
+		return true;
+	}
+	template <typename _type>
+	static std::string obj_to_xml(const _type& obj, const std::string& root = "", bool isAttribute = false)
+	{
+		XmlWriter writer(isAttribute);
+		writer.convert(root.c_str(), obj);
+		return writer.to_xml_str();
+	}
+	template<typename _type>
+	static bool obj_to_save_xml_file(const char* filename, const _type& data, const std::string& root = "", bool isAttribute = false)
+	{
+		XmlWriter writer(isAttribute);
+		writer.convert(root.c_str(), data);
+		return writer.save_xml_file(filename);
+	}
+}//namespace reflexxml
 
 //"##NAME" as front join. "NAME##" as back json
 /******************************************Macro Meta Program*****************************************/
 #define STRUCT_FUNC_COMMON                                          \
 public:                                                             \
-    swtraits::condition_t cond_t_;                                  \
+    reflextraits::condition_t cond_t_;                                  \
 /********************************************protocol_to_struct***************************************/
 #define STRUCT_FUNC_TOX_BEGIN(FNAME)                                \
   template<typename _doc>                                           \
@@ -57,7 +58,7 @@ public:                                                             \
         obj.convert(#M, this->M);
 //alias variable name
 #define STRUCT_ACT_TOX_A(M, A_NAME)                                 \
-        obj.convert(swtraits::alias_name_conversion(#M, A_NAME).c_str(), this->M);
+        obj.convert(reflextraits::alias_name_conversion(#M, A_NAME).c_str(), this->M);
 #define STRUCT_FUNC_TOX_END }
 /*******************************************struct_to_protocol****************************************/
 #define STRUCT_FUNC_TOS_BEGIN(FNAME)                                \
@@ -68,21 +69,9 @@ public:                                                             \
         obj.convert(#M, this->M);
 //alias variable name
 #define STRUCT_ACT_TOS_A(M, A_NAME)                                 \
-        obj.convert(swtraits::alias_name_conversion(#M, A_NAME).c_str(), this->M);
+        obj.convert(reflextraits::alias_name_conversion(#M, A_NAME).c_str(), this->M);
 #define STRUCT_FUNC_TOS_END	}
 /********************************************macro epand param*****************************************/
-/*#define PARAM_SLOT_POS                                            \
-_99,_98,_97,_96,_95,_94,_93,_92,_91,_90,                            \
-_89,_88,_87,_86,_85,_84,_83,_82,_81,_80,                            \
-_79,_78,_77,_76,_75,_74,_73,_72,_71,_70,                            \
-_69,_68,_67,_66,_65,_64,_63,_62,_61,_60,                            \
-_59,_58,_57,_56,_55,_54,_53,_52,_51,_50,                            \
-_49,_48,_47,_46,_45,_44,_43,_42,_41,_40,                            \
-_39,_38,_37,_36,_35,_34,_33,_32,_31,_30,                            \
-_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,                            \
-_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,                            \
-_9,_8,_7,_6,_5,_4,_3,_2,_1 */
-
 #define STRUCT_COUNT(LEVEL,ACTION,                                  \
 _99,_98,_97,_96,_95,_94,_93,_92,_91,_90,                            \
 _89,_88,_87,_86,_85,_84,_83,_82,_81,_80,                            \
@@ -568,13 +557,9 @@ _9, _8, _7, _6, _5, _4, _3, _2, _1)                                 \
 #define STRUCT_L2_99(ACT, M,...)  STRUCT_L2_DEF(ACT, M)     STRUCT_L2_98(ACT, __VA_ARGS__)
 #endif
 /*********************************************************************************************************/
-#define SW_JSON(...)\
+#define REFLEX_BIND(...)\
     STRUCT_FUNC_COMMON\
-    STRUCT_FUNC_TOX_BEGIN(json) STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
-    STRUCT_FUNC_TOS_BEGIN(json) STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
+    STRUCT_FUNC_TOX_BEGIN(obj) STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
+    STRUCT_FUNC_TOS_BEGIN(obj) STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
 
-#define SW_XML(...)\
-    STRUCT_FUNC_COMMON\
-    STRUCT_FUNC_TOX_BEGIN(xml) STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
-    STRUCT_FUNC_TOS_BEGIN(xml) STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
-#endif
+#endif //REFLEX_FORMAT_HPP_

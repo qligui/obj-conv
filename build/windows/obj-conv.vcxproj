@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\sw-protocol\rw_json.hpp" />
-    <ClInclude Include="..\..\sw-protocol\rw_traits_type.hpp" />
-    <ClInclude Include="..\..\sw-protocol\rw_xml.hpp" />
-    <ClInclude Include="..\..\sw-protocol\sw_protocol.hpp" />
+    <ClInclude Include="..\..\reflex_format\reflex_format.hpp" />
+    <ClInclude Include="..\..\reflex_format\rw_json.hpp" />
+    <ClInclude Include="..\..\reflex_format\rw_traits_type.hpp" />
+    <ClInclude Include="..\..\reflex_format\rw_xml.hpp" />
     <ClInclude Include="..\..\thirdparty\tinyxml\tinyxml2.h" />
   </ItemGroup>
   <ItemGroup>

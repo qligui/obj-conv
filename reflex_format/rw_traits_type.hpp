@@ -2,7 +2,7 @@
 #define RW_TRAITS_TYPE_HPP_
 #include <type_traits>
 
-namespace swtraits {
+namespace reflextraits {
 /* c++11 before implement:traits(url:https://izualzhy.cn/SFINAE-and-enable_if)
 template<typename _type>
 struct has_member_condition
@@ -50,4 +50,4 @@ static std::string alias_name_conversion(const std::string& key, const std::stri
     return alias_name;
 }
 }
-#endif
+#endif//RW_TRAITS_TYPE_HPP_

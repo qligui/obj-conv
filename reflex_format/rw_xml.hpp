@@ -7,10 +7,10 @@
 #include <tinyxml/tinyxml2.h>
 #include "rw_traits_type.hpp"
 
-namespace swxml
+namespace reflexxml
 {
 using namespace tinyxml2;
-using namespace swtraits;
+using namespace reflextraits;
 class RWriter
 {
 public:
@@ -107,22 +107,6 @@ public:
 
     bool convert(const char* key, std::string& val)
     {
-        //if (nullptr == key) {
-        //    printf("key value empty.\n");
-        //    return false;
-        //}
-        //XMLNode* node = get_current_node();
-        //if (nullptr == node) {
-        //    printf("key:%s\n, node exist.\n", key);
-        //    return true;
-        //}
-        //val = (attribute_ ? node->ToElement()->Attribute(key) : node->FirstChildElement(key)->GetText());
-        //return true;
-        //XMLNode* node = get_current_node();
-        //printf("%s\n", node->Value());
-        //node->ToElement()->Attribute(key);
-        //return true;
-        //node->ToElement()->GetText();
         XML_GETVAL(Attribute, GetText);
     }
     bool convert(const char* key, int8_t& val)
@@ -234,7 +218,7 @@ public:
     bool convert(const char* key, _type& val)
     {
         begin_object(key);
-        val.xml_to_struct(*this);
+        val.obj_to_struct(*this);
         end_object();
         return true;
     }
@@ -486,9 +470,9 @@ public:
     void convert(const char* key, const _type& data)
     {
         this->begin_object(key);
-        data.struct_to_xml(*this, key);
+        data.struct_to_obj(*this, key);
         this->end_object();
     }
 };
-} //namespace swxml
+} //namespace reflexxml
 #endif //RW_XML_HPP_
