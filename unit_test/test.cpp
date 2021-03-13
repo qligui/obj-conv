@@ -17,7 +17,7 @@ struct Host
     uint32_t type;
     uint32_t mode;
     std::vector<int> reserve;
-    SW_JSON(O(hw_id, license, ip, type, mode, tddd))
+    REFLEX_BIND(O(hw_id, license, ip, type, mode, tddd))
 };
 
 TEST_CASE("json_obj_test")
