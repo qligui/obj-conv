@@ -31,10 +31,10 @@ TEST_CASE("json_obj_test")
 		host.hw_id[i] = 'x';
 		host.license[i] = 'x';
 	}
-	auto json_str = swjson::obj_to_json(host);
+	auto json_str = reflexjson::obj_to_json(host);
 	std::cout << json_str << std::endl;
 	Host host222;
-	swjson::json_to_obj(json_str, host222);
+	reflexjson::json_to_obj(json_str, host222);
 	REQUIRE(host222.hw_id == host.hw_id);
 	REQUIRE(host222.ip == host.ip);
 	REQUIRE(host222.tddd == host.tddd);
