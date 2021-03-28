@@ -50,7 +50,7 @@ protected:
     }
     const std::string key() const
     {
-        key_ != nullptr ? key_ : std::to_string(index_);
+        return key_ != nullptr ? key_ : std::to_string(index_);
     }
 };
 class JsonReader :public Reader<JsonReader>
