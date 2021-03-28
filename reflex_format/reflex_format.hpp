@@ -1,5 +1,5 @@
-#ifndef REFLEX_FORMAT_HPP
-#define REFLEX_FORMAT_HPP
+#ifndef REFLEX_FORMAT_HPP_
+#define REFLEX_FORMAT_HPP_
 
 #include "rw_json.hpp"
 #include "rw_xml.hpp"
