@@ -4,6 +4,7 @@
 #include <list>
 #include <memory>
 #include <stack>
+#include <typeinfo>
 #include <tinyxml/tinyxml2.h>
 #include "rw_traits_type.hpp"
 
@@ -101,13 +102,19 @@ public:
               printf("key label:%s, node exist.\n", key);       \
               return true;                                      \
            }                                                    \
+           if(typeid(val) == typeid(std::string)){              \
+              if(nullptr == child_elem->GetText()){             \
+                  printf("key label value is null.\n");         \
+                  return true;                                  \
+              }                                                 \
+           }                                                    \
            val = __VA_ARGS__(child_elem->textfunc());           \
         }                                                       \
         return true;
 
     bool convert(const char* key, std::string& val)
     {
-        XML_GETVAL(Attribute, GetText);
+        XML_GETVAL(Attribute, GetText, (std::string));
     }
     bool convert(const char* key, int8_t& val)
     {

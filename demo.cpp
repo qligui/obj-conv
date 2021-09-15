@@ -30,7 +30,7 @@ struct User
     std::string  mail;
     User(int64_t i = 0, const string& n = "", const string& m = "") :id(i), name(n), mail(m) {}
 public:
-    swtraits::condition_t cond_t_;
+    reflextraits::condition_t cond_t_;
     template<typename _doc> void xml_to_struct(_doc& obj)
     {
         obj.convert(swtraits::alias_name_conversion("id", "card_id").c_str(), this->id);
@@ -50,7 +50,7 @@ struct Company {
     User person;
     Company() :master(0) {}
 public:
-    swtraits::condition_t cond_t_;
+    reflextraits::condition_t cond_t_;
     template<typename _doc>
     void xml_to_struct(_doc& obj) {
         obj.convert("name", this->name);
@@ -77,15 +77,17 @@ int main(int argc, char* argv[])
     compay.members[0] = User(1, "xxxxx", "xxx@gmail.com");
     compay.members[1] = User(2, "yyyyyy", "yyy@gmail.com");
     compay.person = User(1, "zzzzzz", "zzz@gmail.com");
-    //auto xml_str = swxml::obj_to_xml(compay, "config");
+#if 1
+    auto xml_str = reflexxml::obj_to_xml(compay, "config");
     reflexxml::obj_to_save_xml_file("./example.xml", compay, "config");
-    //std::cout << xml_str << std::endl;
+    std::cout << xml_str << std::endl;
     Company cmpy2;
     reflexxml::xml_to_obj("./example.xml", cmpy2, false, true);
-
+#else
     auto json_str = reflexjson::obj_to_json(compay);
     std::cout << json_str << std::endl;
     Company cmpy3;
     reflexjson::json_to_obj(json_str, cmpy3);
+#endif
     getchar();
 }
