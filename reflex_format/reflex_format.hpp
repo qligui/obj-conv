@@ -3,46 +3,48 @@
 
 #include "rw_json.hpp"
 #include "rw_xml.hpp"
-namespace reflexjson {
-    template <typename _type>
-    static bool json_to_obj(const std::string& str, _type& obj, bool isfile = false)
-    {
-        JsonReader reader(str, isfile);
-        reader.convert(nullptr, obj);
-        return true;
-    }
-    //"indentCount = 0"  show json format. "indentChar" show split character
-    template <typename _type>
-    static std::string obj_to_json(const _type& obj, const std::string& root = "", int indentCount = -1, char indentChar = ' ')
-    {
-        JsonWriter writer(indentCount, indentChar);
-        writer.convert(root.c_str(), obj);
-        return writer.to_json_str();
-    }
-}//namespace reflexjson
-namespace reflexxml {
-	template <typename _type>
-	static bool xml_to_obj(const std::string& str, _type& data, bool attribute = false, bool isfile = false)
-	{
-		XmlReader reader(str, attribute, isfile);
-		reader.convert(nullptr, data);
-		return true;
-	}
-	template <typename _type>
-	static std::string obj_to_xml(const _type& obj, const std::string& root = "", bool isAttribute = false)
-	{
-		XmlWriter writer(isAttribute);
-		writer.convert(root.c_str(), obj);
-		return writer.to_xml_str();
-	}
-	template<typename _type>
-	static bool obj_to_save_xml_file(const char* filename, const _type& data, const std::string& root = "", bool isAttribute = false)
-	{
-		XmlWriter writer(isAttribute);
-		writer.convert(root.c_str(), data);
-		return writer.save_xml_file(filename);
-	}
-}//namespace reflexxml
+
+namespace reflexjson{
+template <typename _type>
+static bool json_to_obj(const std::string &str, _type &obj, bool isfile = false)
+{
+    JsonReader reader(str, isfile);
+    reader.convert(nullptr, obj);
+    return true;
+}
+//"indentCount = 0"  show json format. "indentChar" show split character
+template <typename _type>
+static std::string obj_to_json(const _type &obj, const std::string &root = "", int indentCount = -1, char indentChar = ' ')
+{
+    JsonWriter writer(indentCount, indentChar);
+    writer.convert(root.c_str(), obj);
+    return writer.to_json_str();
+}
+} // reflexjson
+
+namespace reflexxml{
+template <typename _type>
+static bool xml_to_obj(const std::string &str, _type &data, bool attribute = false, bool isfile = false)
+{
+    XmlReader reader(str, attribute, isfile);
+    reader.convert(nullptr, data);
+    return true;
+}
+template <typename _type>
+static std::string obj_to_xml(const _type &obj, const std::string &root = "", bool isAttribute = false)
+{
+    XmlWriter writer(isAttribute);
+    writer.convert(root.c_str(), obj);
+    return writer.to_xml_str();
+}
+template <typename _type>
+static bool obj_to_save_xml_file(const char *filename, const _type &data, const std::string &root = "", bool isAttribute = false)
+{
+    XmlWriter writer(isAttribute);
+    writer.convert(root.c_str(), data);
+    return writer.save_xml_file(filename);
+}
+}  // reflexxml
 
 //"##NAME" as front join. "NAME##" as back json
 /******************************************Macro Meta Program*****************************************/
@@ -562,4 +564,8 @@ _9, _8, _7, _6, _5, _4, _3, _2, _1)                                 \
     STRUCT_FUNC_TOX_BEGIN(obj) STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
     STRUCT_FUNC_TOS_BEGIN(obj) STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
 
+#define REFLEX_BIND_VOID(...)\
+    STRUCT_FUNC_COMMON\
+    STRUCT_FUNC_TOX_BEGIN(obj) STRUCT_FUNC_TOX_END\
+    STRUCT_FUNC_TOS_BEGIN(obj) STRUCT_FUNC_TOS_END
 #endif //REFLEX_FORMAT_HPP_
