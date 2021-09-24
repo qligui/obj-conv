@@ -245,7 +245,7 @@ public:
         for (auto i = 0; i < num; ++i)
         {
             _type elem;
-            (*obj)[i].convert(nullptr, &elem);
+            (*obj)[i].convert(nullptr, elem);
             val.insert(elem);
         }
         return true;
@@ -639,9 +639,16 @@ public:
     {
         data_set_key(key);
         this->array_begin();
+
+#if (_HAS_CXX17) || (__cplusplus >= 201703L)
         std::apply([this](auto&&... args) {
             ((this->convert("", args)), ...);
             }, data);
+#else
+        for_each_tuple(data, [this](auto&& args) {
+            this->convert("", args);
+            });
+#endif
         this->array_end();
     }
     template <typename _type>
