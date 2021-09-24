@@ -5,12 +5,14 @@
 #define RAPIDJSON_HAS_STDSTRING 1
 #endif
 #include <fstream>
+#include <string>
 #include <memory>
 #include <vector>
 #include <list>
 #include <map>
 #include <set>
 #include <unordered_map>
+#include <tuple>
 #include <algorithm>
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
@@ -278,6 +280,22 @@ public:
         }
         return true;
     }
+	template<typename... _type>
+	bool convert(const char* key, std::tuple<_type...>& data)
+    {
+        JsonReader doc_val;
+        JsonReader* obj = get_obj(key, &doc_val);
+        if (nullptr == obj)
+            return false;
+        size_t num = obj->size();
+        int index = 0;
+        for_each_tuple(data, [obj, &index](auto&& args) {
+            (*obj)[index].convert(nullptr, args);
+            index++;
+            });
+
+        return true;
+	}
     template<typename _type>
     bool convert(const char* key, std::shared_ptr<_type>& val)
     {
@@ -614,6 +632,17 @@ public:
             this->convert(iter->first.c_str(), iter->second);
         }
         this->object_end();
+    }
+    //add tuple tpye support https://en.cppreference.com/w/cpp/utility/apply
+    template<typename... _type>
+    void convert(const char* key, const std::tuple<_type...>& data)
+    {
+        data_set_key(key);
+        this->array_begin();
+        std::apply([this](auto&&... args) {
+            ((this->convert("", args)), ...);
+            }, data);
+        this->array_end();
     }
     template <typename _type>
     void convert(const char* key, const std::shared_ptr<_type>& val)

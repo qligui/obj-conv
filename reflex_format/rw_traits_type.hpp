@@ -39,7 +39,9 @@ struct condition_t
         cond_func_ = func;
     }
 };
-
+#ifdef __linux__
+ __attribute__((unused)) 
+ #endif
 static std::string alias_name_conversion(const std::string& key, const std::string& alias_name)
 {
     if (alias_name.empty())
@@ -49,5 +51,18 @@ static std::string alias_name_conversion(const std::string& key, const std::stri
     }
     return alias_name;
 }
+//reference https://qastack.cn/programming/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple
+ template<std::size_t TypeNum = 0, typename Func, typename... Tp>
+ inline typename std::enable_if<TypeNum == sizeof...(Tp), void>::type
+     for_each_tuple(std::tuple<Tp...>&, Func) // Unused arguments are given no names.
+ { }
+
+ template<std::size_t TypeNum = 0, typename FuncT, typename... Tp>
+ inline typename std::enable_if < TypeNum < sizeof...(Tp), void>::type
+     for_each_tuple(std::tuple<Tp...>& args, FuncT func)
+ {
+     func(std::get<TypeNum>(args));
+     for_each_tuple<TypeNum + 1, FuncT, Tp...>(args, func);
+ }
 }
 #endif//RW_TRAITS_TYPE_HPP_
