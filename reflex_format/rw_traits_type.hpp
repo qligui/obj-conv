@@ -1,4 +1,4 @@
-#ifndef RW_TRAITS_TYPE_HPP_
+﻿#ifndef RW_TRAITS_TYPE_HPP_
 #define RW_TRAITS_TYPE_HPP_
 #include <type_traits>
 
