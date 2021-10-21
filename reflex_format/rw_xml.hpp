@@ -1,4 +1,4 @@
-#ifndef RW_XML_HPP_
+﻿#ifndef RW_XML_HPP_
 #define RW_XML_HPP_
 #include <vector>
 #include <list>

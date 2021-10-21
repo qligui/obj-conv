@@ -280,8 +280,8 @@ public:
         }
         return true;
     }
-	template<typename... _type>
-	bool convert(const char* key, std::tuple<_type...>& data)
+    template<typename... _type>
+    bool convert(const char* key, std::tuple<_type...>& data)
     {
         JsonReader doc_val;
         JsonReader* obj = get_obj(key, &doc_val);
@@ -295,7 +295,7 @@ public:
             });
 
         return true;
-	}
+    }
     template<typename _type>
     bool convert(const char* key, std::shared_ptr<_type>& val)
     {

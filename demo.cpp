@@ -22,6 +22,13 @@ struct Company {
     Company() :master(0) {}
     REFLEX_BIND(O(name, master, members, person))
 };
+
+struct Worker : public Company
+{
+    std::string address;
+    REFLEX_BIND(I(Company), O(address))
+};
+
 /*
 struct User
 {
@@ -67,7 +74,24 @@ public:
         obj.convert("person", this->person);
     }
 };
-*/
+struct Worker : public Company
+{
+    std::string address;
+public:
+    reflextraits::condition_t cond_t_;
+    template<typename _doc>
+    void obj_to_struct(_doc& obj)
+    {
+        Company::obj_to_struct(obj);
+        obj.convert("address", this->address);
+    }
+    template <typename _obj_type>
+    void struct_to_obj(_obj_type& obj, const char* root) const
+    {
+        Company::struct_to_obj(obj, root);
+        obj.convert("address", this->address);
+    }
+}*/
 int main(int argc, char* argv[])
 {
     Company compay;

@@ -1,4 +1,4 @@
-#ifndef REFLEX_FORMAT_HPP_
+﻿#ifndef REFLEX_FORMAT_HPP_
 #define REFLEX_FORMAT_HPP_
 
 #include "rw_json.hpp"
@@ -50,29 +50,35 @@ static bool obj_to_save_xml_file(const char *filename, const _type &data, const 
 /******************************************Macro Meta Program*****************************************/
 #define STRUCT_FUNC_COMMON                                          \
 public:                                                             \
-    reflextraits::condition_t cond_t_;                                  \
+    reflextraits::condition_t cond_t_;                              \
 /********************************************protocol_to_struct***************************************/
-#define STRUCT_FUNC_TOX_BEGIN(FNAME)                                \
+#define STRUCT_FUNC_TOX_BEGIN                                       \
   template<typename _doc>                                           \
-    void FNAME##_to_struct(_doc& obj) {                              
+    void obj_to_struct(_doc& obj) {                              
 //bind variable name
 #define STRUCT_ACT_TOX_O(M)                                         \
         obj.convert(#M, this->M);
 //alias variable name
 #define STRUCT_ACT_TOX_A(M, A_NAME)                                 \
         obj.convert(reflextraits::alias_name_conversion(#M, A_NAME).c_str(), this->M);
+//inherited class variable name
+#define STRUCT_ACT_TOX_I(CLASS)                                     \
+        CLASS::obj_to_struct(obj);
 #define STRUCT_FUNC_TOX_END }
 /*******************************************struct_to_protocol****************************************/
-#define STRUCT_FUNC_TOS_BEGIN(FNAME)                                \
+#define STRUCT_FUNC_TOS_BEGIN                                       \
     template <typename _obj_type>                                   \
-    void struct_to_##FNAME(_obj_type& obj, const char *root) const {
+    void struct_to_obj(_obj_type& obj, const char *root) const {
 //bind variable name
 #define STRUCT_ACT_TOS_O(M)                                         \
         obj.convert(#M, this->M);
 //alias variable name
 #define STRUCT_ACT_TOS_A(M, A_NAME)                                 \
         obj.convert(reflextraits::alias_name_conversion(#M, A_NAME).c_str(), this->M);
-#define STRUCT_FUNC_TOS_END	}
+//inherited class variable name
+#define STRUCT_ACT_TOS_I(CLASS)                                     \
+        CLASS::struct_to_obj(obj, root);
+#define STRUCT_FUNC_TOS_END }
 /********************************************macro epand param*****************************************/
 #define STRUCT_COUNT(LEVEL,ACTION,                                  \
 _99,_98,_97,_96,_95,_94,_93,_92,_91,_90,                            \
@@ -90,12 +96,15 @@ _9,_8,_7,_6,_5,_4,_3,_2,_1, N,...) LEVEL##N
 
 #define STRUCT_L1_TOX(x) STRUCT_L1_TOX_##x
 #define STRUCT_L1_TOS(x) STRUCT_L1_TOS_##x
+#define STRUCT_L1_TOI(x) STRUCT_L1_TOI_##x
 //string(binary) to obj
 #define STRUCT_L1_TOX_O(...)  STRUCT_N2(STRUCT_L2, STRUCT_ACT_TOX_O, __VA_ARGS__)
 #define STRUCT_L1_TOX_A(M,A)  STRUCT_ACT_TOX_A(M, A)
+#define STRUCT_L1_TOX_I(...)  STRUCT_N2(STRUCT_L2, STRUCT_ACT_TOX_I, __VA_ARGS__)
 //obj to string(binary)
 #define  STRUCT_L1_TOS_O(...) STRUCT_N2(STRUCT_L2, STRUCT_ACT_TOS_O, __VA_ARGS__)
 #define  STRUCT_L1_TOS_A(M, A) STRUCT_ACT_TOS_A(M,A)
+#define  STRUCT_L1_TOS_I(...) STRUCT_N2(STRUCT_L2, STRUCT_ACT_TOS_I, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define STRUCT_N(LEVEL, ACTION, ...)                                \
@@ -561,11 +570,11 @@ _9, _8, _7, _6, _5, _4, _3, _2, _1)                                 \
 /*********************************************************************************************************/
 #define REFLEX_BIND(...)\
     STRUCT_FUNC_COMMON\
-    STRUCT_FUNC_TOX_BEGIN(obj) STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
-    STRUCT_FUNC_TOS_BEGIN(obj) STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
+    STRUCT_FUNC_TOX_BEGIN STRUCT_N(STRUCT_L1, STRUCT_L1_TOX, __VA_ARGS__) STRUCT_FUNC_TOX_END\
+    STRUCT_FUNC_TOS_BEGIN STRUCT_N(STRUCT_L1, STRUCT_L1_TOS, __VA_ARGS__) STRUCT_FUNC_TOS_END
 
 #define REFLEX_BIND_VOID(...)\
     STRUCT_FUNC_COMMON\
-    STRUCT_FUNC_TOX_BEGIN(obj) STRUCT_FUNC_TOX_END\
-    STRUCT_FUNC_TOS_BEGIN(obj) STRUCT_FUNC_TOS_END
+    STRUCT_FUNC_TOX_BEGIN STRUCT_FUNC_TOX_END\
+    STRUCT_FUNC_TOS_BEGIN STRUCT_FUNC_TOS_END
 #endif //REFLEX_FORMAT_HPP_
