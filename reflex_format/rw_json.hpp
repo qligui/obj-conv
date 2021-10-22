@@ -212,7 +212,7 @@ public:
             return false;
         size_t num = obj->size();
         val.resize(num);
-        for (auto i = 0; i < num; ++i)
+        for (size_t i = 0; i < num; ++i)
         {
             (*obj)[i].convert(nullptr, val[i]);
         }
@@ -226,10 +226,10 @@ public:
         if (nullptr == obj)
             return false;
         size_t num = obj->size();
-        for (auto i = 0; i < num; ++i)
+        for (size_t i = 0; i < num; ++i)
         {
             _type elem;
-            (*obj)[i].convert(nullptr, &elem);
+            (*obj)[i].convert(nullptr, elem);
             val.emplace_back(elem);
         }
         return true;
@@ -242,7 +242,7 @@ public:
         if (nullptr == obj)
             return false;
         size_t num = obj->size();
-        for (auto i = 0; i < num; ++i)
+        for (size_t i = 0; i < num; ++i)
         {
             _type elem;
             (*obj)[i].convert(nullptr, elem);
@@ -325,7 +325,7 @@ public:
             return bret;
         }
         else {
-            for (auto i = 0; i < len; ++i)
+            for (size_t i = 0; i < len; ++i)
             {
                 JsonReader sub = (*obj)[i];
                 if (val.cond_t_.cond_func_(val.cond_t_.parent_, (void*)&sub))
