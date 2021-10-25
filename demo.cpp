@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <vector>
 #include "reflex_format/reflex_format.hpp"
 /*
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     compay.members[0] = User(1, "xxxxx", "xxx@gmail.com");
     compay.members[1] = User(2, "yyyyyy", "yyy@gmail.com");
     compay.person = User(1, "zzzzzz", "zzz@gmail.com");
-#if 1
+#if 0
     auto xml_str = reflexxml::obj_to_xml(compay, "config");
     reflexxml::obj_to_save_xml_file("./example.xml", compay, "config");
     std::cout << xml_str << std::endl;

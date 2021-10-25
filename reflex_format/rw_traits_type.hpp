@@ -2,8 +2,16 @@
 #define RW_TRAITS_TYPE_HPP_
 #include <type_traits>
 
-namespace reflextraits {
-/* c++11 before implement:traits(url:https://izualzhy.cn/SFINAE-and-enable_if)
+namespace reflextraits 
+{
+#if __cplusplus >= 201402L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201402L)
+    //C++14 implement
+    template<typename, typename = std::void_t<>>
+    struct has_member_condition : std::false_type { };
+    template<typename _type>
+    struct has_member_condition<_type, std::void_t<decltype(&_type::cond_t_)>> : std::true_type { };
+#else
+//reference c++11 before implement:traits(url:https://izualzhy.cn/SFINAE-and-enable_if)
 template<typename _type>
 struct has_member_condition
 {
@@ -17,13 +25,7 @@ struct has_member_condition
 
     static bool const value = sizeof(check<_type>(0)) == sizeof(yes);
 };
-*/
-//C++17 implement
-template<typename, typename=std::void_t<>>
-struct has_member_condition : std::false_type{ };
-template<typename _type>
-struct has_member_condition<_type, std::void_t<decltype(&_type::cond_t_)>> : std::true_type{ };
-
+#endif
 //type
 struct condition_t
 {
@@ -46,23 +48,24 @@ static std::string alias_name_conversion(const std::string& key, const std::stri
 {
     if (alias_name.empty())
     {
-        printf("Error:alais name empty()\n");
+        printf("error: alais name empty()\n");
         return "xxxxxx---xxxxx----error-name---xxxxx--xxxxx";
     }
     return alias_name;
 }
-//reference https://qastack.cn/programming/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple
- template<std::size_t TypeNum = 0, typename Func, typename... Tp>
- inline typename std::enable_if<TypeNum == sizeof...(Tp), void>::type
-     for_each_tuple(std::tuple<Tp...>&, Func) // Unused arguments are given no names.
- { }
 
- template<std::size_t TypeNum = 0, typename FuncT, typename... Tp>
- inline typename std::enable_if < TypeNum < sizeof...(Tp), void>::type
-     for_each_tuple(std::tuple<Tp...>& args, FuncT func)
- {
-     func(std::get<TypeNum>(args));
-     for_each_tuple<TypeNum + 1, FuncT, Tp...>(args, func);
- }
+//reference https://qastack.cn/programming/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple
+//unused arguments are given no names.
+template<std::size_t type_num = 0, typename _func_type, typename... _type>
+inline typename std::enable_if<type_num == sizeof...(_type), void>::type
+for_each_tuple(std::tuple<_type...>&, _func_type){ }
+
+template<std::size_t type_num = 0, typename _func_type, typename... _type>
+inline typename std::enable_if < type_num < sizeof...(_type), void>::type
+    for_each_tuple(std::tuple<_type...>& args, _func_type func)
+{
+    func(std::get<type_num>(args));
+    for_each_tuple<type_num + 1, _func_type, _type...>(args, func);
+}
 }
 #endif//RW_TRAITS_TYPE_HPP_

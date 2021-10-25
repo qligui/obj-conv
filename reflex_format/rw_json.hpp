@@ -74,7 +74,7 @@ public:
             {
                 std::ifstream fs(str.c_str(), std::ifstream::binary);
                 if (!fs) {
-                    err = "Open file[" + str + "] fail.";
+                    err = "open file[" + str + "] fail.";
                     break;
                 }
                 data = std::string((std::istreambuf_iterator<char>(fs)), std::istreambuf_iterator<char>());
@@ -90,12 +90,12 @@ public:
                 size_t offset = doc_->GetErrorOffset();
                 if (isfile) {
                     std::string err_info = data.substr(offset, offset + 32);
-                    err = "Parse json file [" + str + "] fail. " + err_info;
+                    err = "parse json file [" + str + "] fail. " + err_info;
                     break;
                 }
                 else {
                     std::string err_info = str.substr(offset, offset + 32);
-                    err = "Parse json string [" + str + "] fail. " + err_info;
+                    err = "parse json string [" + str + "] fail. " + err_info;
                     break;
                 }
             }
@@ -107,18 +107,19 @@ public:
     }
     ~JsonReader() { }
 public:
-#define JSON_GETVAL(f, ...)                         \
-        const rapidjson::Value *v = get_val(key);   \
-        if (NULL != v) {                            \
-            try {                                   \
-                val = __VA_ARGS__ v->f();           \
-            } catch (const std::exception&e) {      \
-                printf("err:%s:%s\n",key, e.what());\
-            }                                       \
-            return true;                            \
-        }                                           \
-        else                                        \
-           return false
+#define JSON_GETVAL(f, ...)                             \
+        const rapidjson::Value* v = get_val(key);       \
+        if (NULL == v) {                                \
+            return false;                               \
+        }                                               \
+        try {                                           \
+            val = __VA_ARGS__ v->f();                   \
+        }                                               \
+        catch (const std::exception& e) {               \
+            printf("err:%s:%s\n", key, e.what());       \
+            return false;                               \
+        }                                               \
+        return true;                                    \
 
     bool convert(const char* key, std::vector<char>& val)
     {
@@ -272,7 +273,9 @@ public:
         JsonReader* obj = get_obj(key, &doc_val);
         if (nullptr == obj)
             return false;
-        for (auto data = obj->begin(); data; data = data.next())//data operator bool()
+
+        //data operator bool()
+        for (auto data = obj->begin(); data; data = data.next())
         {
             _type elem;
             data.convert(nullptr, elem);
@@ -287,6 +290,7 @@ public:
         JsonReader* obj = get_obj(key, &doc_val);
         if (nullptr == obj)
             return false;
+
         size_t num = obj->size();
         int index = 0;
         for_each_tuple(data, [obj, &index](auto&& args) {
@@ -639,8 +643,8 @@ public:
     {
         data_set_key(key);
         this->array_begin();
-
-#if (_HAS_CXX17) || (__cplusplus >= 201703L)
+//C++17 implement
+#if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
         std::apply([this](auto&&... args) {
             ((this->convert("", args)), ...);
             }, data);

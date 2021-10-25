@@ -9,8 +9,7 @@ template <typename _type>
 static bool json_to_obj(const std::string &str, _type &obj, bool isfile = false)
 {
     JsonReader reader(str, isfile);
-    reader.convert(nullptr, obj);
-    return true;
+    return reader.convert(nullptr, obj);
 }
 //"indentCount = 0"  show json format. "indentChar" show split character
 template <typename _type>
@@ -27,8 +26,7 @@ template <typename _type>
 static bool xml_to_obj(const std::string &str, _type &data, bool attribute = false, bool isfile = false)
 {
     XmlReader reader(str, attribute, isfile);
-    reader.convert(nullptr, data);
-    return true;
+    return reader.convert(nullptr, data);
 }
 template <typename _type>
 static std::string obj_to_xml(const _type &obj, const std::string &root = "", bool isAttribute = false)
@@ -47,11 +45,11 @@ static bool obj_to_save_xml_file(const char *filename, const _type &data, const 
 }  // reflexxml
 
 //"##NAME" as front join. "NAME##" as back json
-/******************************************Macro Meta Program*****************************************/
+/******************************************macro meta program*****************************************/
 #define STRUCT_FUNC_COMMON                                          \
 public:                                                             \
     reflextraits::condition_t cond_t_;                              \
-/********************************************protocol_to_struct***************************************/
+/******************************************protocol_to_struct*****************************************/
 #define STRUCT_FUNC_TOX_BEGIN                                       \
   template<typename _doc>                                           \
     void obj_to_struct(_doc& obj) {                              
@@ -65,7 +63,7 @@ public:                                                             \
 #define STRUCT_ACT_TOX_I(CLASS)                                     \
         CLASS::obj_to_struct(obj);
 #define STRUCT_FUNC_TOX_END }
-/*******************************************struct_to_protocol****************************************/
+/*****************************************struct_to_protocol********************************************/
 #define STRUCT_FUNC_TOS_BEGIN                                       \
     template <typename _obj_type>                                   \
     void struct_to_obj(_obj_type& obj, const char *root) const {
@@ -79,7 +77,7 @@ public:                                                             \
 #define STRUCT_ACT_TOS_I(CLASS)                                     \
         CLASS::struct_to_obj(obj, root);
 #define STRUCT_FUNC_TOS_END }
-/********************************************macro epand param*****************************************/
+/******************************************macro epand param******************************************/
 #define STRUCT_COUNT(LEVEL,ACTION,                                  \
 _99,_98,_97,_96,_95,_94,_93,_92,_91,_90,                            \
 _89,_88,_87,_86,_85,_84,_83,_82,_81,_80,                            \
