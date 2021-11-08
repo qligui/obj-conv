@@ -107,16 +107,19 @@ public:
     }
     ~JsonReader() { }
 public:
-#define JSON_GETVAL(f, ...)                             \
+#define JSON_GETVAL(f, is_f, ...)                       \
         const rapidjson::Value* v = get_val(key);       \
         if (NULL == v) {                                \
             return false;                               \
         }                                               \
         try {                                           \
+            if (!v->is_f()) {                           \
+                throw reflex_exption("key type error"); \
+            }                                           \
             val = __VA_ARGS__ v->f();                   \
         }                                               \
         catch (const std::exception& e) {               \
-            printf("err:%s:%s\n", key, e.what());       \
+            printf("key<%s>:%s\n", key, e.what());      \
             return false;                               \
         }                                               \
         return true;                                    \
@@ -131,47 +134,47 @@ public:
     }
     bool convert(const char* key, std::string& val)
     {
-        JSON_GETVAL(GetString);
+        JSON_GETVAL(GetString, IsString);
     }
     bool convert(const char* key, int8_t& val)
     {
-        JSON_GETVAL(GetInt, (int8_t));
+        JSON_GETVAL(GetInt, IsInt, (int8_t));
     }
     bool convert(const char* key, uint8_t& val)
     {
-        JSON_GETVAL(GetInt, (uint8_t));
+        JSON_GETVAL(GetInt, IsInt, (uint8_t));
     }
     bool convert(const char* key, int16_t& val)
     {
-        JSON_GETVAL(GetInt, (int16_t));
+        JSON_GETVAL(GetInt, IsInt, (int16_t));
     }
     bool convert(const char* key, uint16_t& val)
     {
-        JSON_GETVAL(GetInt, (uint16_t));
+        JSON_GETVAL(GetInt, IsInt, (uint16_t));
     }
     bool convert(const char* key, int32_t& val)
     {
-        JSON_GETVAL(GetInt);
+        JSON_GETVAL(GetInt, IsInt);
     }
     bool convert(const char* key, uint32_t& val)
     {
-        JSON_GETVAL(GetUint);
+        JSON_GETVAL(GetUint, IsUint);
     }
     bool convert(const char* key, int64_t& val)
     {
-        JSON_GETVAL(GetInt64);
+        JSON_GETVAL(GetInt64, IsInt64);
     }
     bool convert(const char* key, uint64_t& val)
     {
-        JSON_GETVAL(GetUint64);
+        JSON_GETVAL(GetUint64, IsUint64);
     }
     bool convert(const char* key, double& val)
     {
-        JSON_GETVAL(GetDouble);
+        JSON_GETVAL(GetDouble, IsDouble);
     }
     bool convert(const char* key, float& val)
     {
-        JSON_GETVAL(GetFloat);
+        JSON_GETVAL(GetFloat, IsDouble);
     }
     bool convert(const char* key, bool& val)
     {
@@ -192,7 +195,7 @@ public:
         }
         else
         {
-            printf("%s:wish bool, but not bool or int\n", key);
+            throw reflex_exption(std::string(key) + "wish bool, but not bool or int");
             return false;
         }
     }
@@ -291,7 +294,6 @@ public:
         if (nullptr == obj)
             return false;
 
-        size_t num = obj->size();
         int index = 0;
         for_each_tuple(data, [obj, &index](auto&& args) {
             (*obj)[index].convert(nullptr, args);
@@ -360,11 +362,11 @@ public:
         }
         return JsonReader(&(*val_)[key], this, key);
     }
-    JsonReader operator[](int32_t index)
+    JsonReader operator[](size_t index)
     {
         if (!val_->IsArray())
         {
-            printf("index:%d out of index\n", index);
+            printf("index:%llu out of index\n", index);
             return JsonReader(0, 0, "");
         }
         return JsonReader(&(*val_)[(rapidjson::SizeType)index], this, index);

@@ -109,9 +109,19 @@ int main(int argc, char* argv[])
     reflexxml::xml_to_obj("./example.xml", cmpy2, false, true);
 #else
     auto json_str = reflexjson::obj_to_json(compay);
-    std::cout << json_str << std::endl;
+    //std::cout << json_str << std::endl;
+    json_str = "{\"name\":\"cg\",\"master\":\"2020\", \"members\":[{\"card_id\":1,\"name\":\"xxxxx\",\"mail\":\"xxx@gmail.com\"},"
+    "{\"card_id\":2,\"name\":\"yyyyyy\",\"mail\":\"yyy@gmail.com\"}],\"person\":{\"card_id\":1,\"name\":\"zzzzzz\",\"mail\":\"zzz@gmail.com\"}}";
     Company cmpy3;
-    reflexjson::json_to_obj(json_str, cmpy3);
+    try
+    {
+        reflexjson::json_to_obj(json_str, cmpy3);
+    }
+    catch (const std::exception& e)
+    {
+        printf("%s.", e.what());
+    }
+
 #endif
     getchar();
 }

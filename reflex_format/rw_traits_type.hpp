@@ -1,6 +1,7 @@
 ﻿#ifndef RW_TRAITS_TYPE_HPP_
 #define RW_TRAITS_TYPE_HPP_
 #include <type_traits>
+#include <exception>
 
 namespace reflextraits 
 {
@@ -67,5 +68,18 @@ inline typename std::enable_if < type_num < sizeof...(_type), void>::type
     func(std::get<type_num>(args));
     for_each_tuple<type_num + 1, _func_type, _type...>(args, func);
 }
+
+class reflex_exption : public std::exception
+{
+public:
+    reflex_exption(const std::string& err_msg) : err_msg_(err_msg) {}
+    ~reflex_exption() { }
+    virtual char const* what() const throw()
+    {
+        return err_msg_.c_str();
+    }
+private:
+    std::string err_msg_;
+};
 }
 #endif//RW_TRAITS_TYPE_HPP_
