@@ -11,8 +11,9 @@
 #include <list>
 #include <map>
 #include <set>
-#include <unordered_map>
 #include <tuple>
+#include <variant>
+#include <unordered_map>
 #include <algorithm>
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
@@ -109,7 +110,7 @@ public:
 public:
 #define JSON_GETVAL(f, is_f, ...)                       \
         const rapidjson::Value* v = get_val(key);       \
-        if (NULL == v) {                                \
+        if (nullptr == v) {                             \
             return false;                               \
         }                                               \
         try {                                           \
@@ -119,10 +120,10 @@ public:
             val = __VA_ARGS__ v->f();                   \
         }                                               \
         catch (const std::exception& e) {               \
-            printf("key<%s>:%s\n", key, e.what());      \
+            printf("key<%s>: %s.\n", key, e.what());    \
             return false;                               \
         }                                               \
-        return true;                                    \
+        return true;
 
     bool convert(const char* key, std::vector<char>& val)
     {
@@ -162,7 +163,7 @@ public:
     }
     bool convert(const char* key, int64_t& val)
     {
-        JSON_GETVAL(GetInt64, IsInt64);
+        JSON_GETVAL(GetInt64, IsInt64, (int64_t));
     }
     bool convert(const char* key, uint64_t& val)
     {
@@ -179,11 +180,9 @@ public:
     bool convert(const char* key, bool& val)
     {
         const rapidjson::Value* v = get_val(key);
-        if (NULL == v)
-        {
+        if (nullptr == v)
             return false;
-        }
-        else if (v->IsBool())
+        if (v->IsBool())
         {
             val = v->GetBool();
             return true;
@@ -198,6 +197,35 @@ public:
             throw reflex_exption(std::string(key) + "wish bool, but not bool or int");
             return false;
         }
+    }
+#define VARIANT_IF(is_f, var_type)                                                          \
+        if(v->is_f()){                                                                      \
+            if constexpr (has_variant_type_v<std::decay_t<decltype(val)>, var_type>){       \
+                var_type res{ };                                                            \
+                bret = this->convert(key, res);                                             \
+                constexpr auto idx = variant_index<std::decay_t<decltype(val)>, var_type>();\
+                val.emplace<idx>(res);                                                      \
+                break;                                                                      \
+            }}
+
+    template<typename... _type>
+    bool convert(const char* key, std::variant<_type...>& val)
+    {
+        bool bret = false;
+        const rapidjson::Value* v = get_val(key);
+        if (NULL == v)
+            return bret;
+        do
+        {   //only to support raw type
+            VARIANT_IF(IsInt, int32_t);
+            VARIANT_IF(IsInt64, int64_t);
+            VARIANT_IF(IsDouble, double);
+            VARIANT_IF(IsUint, uint32_t);
+            VARIANT_IF(IsUint64, uint64_t);
+            VARIANT_IF(IsString, std::string);
+            VARIANT_IF(IsBool, bool);
+        } while (false);
+        return bret;
     }
     template<typename _type, typename = std::enable_if_t<std::is_enum_v<_type>>>
     bool convert(const char* key, _type& enum_val)
@@ -248,7 +276,7 @@ public:
         size_t num = obj->size();
         for (size_t i = 0; i < num; ++i)
         {
-            _type elem;
+            _type elem{};
             (*obj)[i].convert(nullptr, elem);
             val.insert(elem);
         }
@@ -294,10 +322,10 @@ public:
         if (nullptr == obj)
             return false;
 
-        int index = 0;
-        for_each_tuple(data, [obj, &index](auto&& args) {
-            (*obj)[index].convert(nullptr, args);
-            index++;
+        std::size_t idx = 0;
+        for_each_tuple(data, [obj, &idx](auto&& args) {
+            (*obj)[idx].convert(nullptr, args);
+            idx++;
             });
 
         return true;
@@ -311,7 +339,7 @@ public:
         }
         return this->convert(key, *val);
     }
-    template<typename _type, std::enable_if_t<has_member_condition<_type>::value, bool> = true>
+    template<typename _type, std::enable_if_t<has_member_condition_v<_type>, bool> = true>
     bool convert(const char* key, _type& val)
     {
         JsonReader doc_val;
@@ -345,6 +373,7 @@ public:
         val.cond_t_.set_value(nullptr, nullptr);
         return bret;
     }
+
     bool has(const char* key)
     {
         return val_->HasMember(key) ? !(*val_)[key].IsNull() : false;
@@ -496,6 +525,7 @@ public:
     {
         json_writer_ != nullptr ? json_writer_->EndObject() : json_pretty_->EndObject();
     }
+
     JsonWriter& convert(const char* key, const std::vector<char>& val)
     {
         std::string str;
@@ -563,11 +593,19 @@ public:
         json_writer_ != nullptr ? json_writer_->Bool(val) : json_pretty_->Bool(val);
         return *this;
     }
+    template<typename... _type>
+    JsonWriter& convert(const char* key, const std::variant<_type...>& val)
+    {
+        std::visit([key, this](auto&& arg) {
+            this->convert(key, arg);
+            }, val);
+        return *this;
+    }
     //add enum tpye check:https://stackoverflow.com/questions/9343329/how-to-know-underlying-type-of-class-enum
-    template<typename _type, typename = typename std::enable_if_t<std::is_enum_v<_type>>>
+    template<typename _type, typename = std::enable_if_t<std::is_enum_v<_type>>>
     JsonWriter& convert(const char* key, const _type& val)
     {
-        return convert(key, static_cast<typename std::underlying_type<_type>::type>(val));
+        return convert(key, static_cast<std::underlying_type_t<_type>>(val));
     }
     template<typename _type, typename = std::enable_if_t<!std::is_same_v<_type, char>>>
     JsonWriter& convert(const char* key, const std::vector<_type>& data)
@@ -616,18 +654,6 @@ public:
         }
         this->object_end();
     }
-    template<typename _key_type, typename _value_type>
-    void convert(const char* key, const std::map<_key_type, _value_type>& data)
-    {
-        data_set_key(key);
-        this->object_begin();
-        for (typename std::map<_key_type, _value_type>::const_iterator iter = data.begin(); iter != data.end(); ++iter)
-        {
-            std::string key_str = std::to_string(iter->first);
-            this->convert(key_str.c_str(), iter->second);
-        }
-        this->object_end();
-    }
     template <typename _type>
     void convert(const char* key, const std::unordered_map<std::string, _type>& data)
     {
@@ -648,7 +674,7 @@ public:
 //C++17 implement
 #if __cplusplus >= 201703L || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
         std::apply([this](auto&&... args) {
-            ((this->convert("", args)), ...);
+            (... ,(this->convert("", args)));
             }, data);
 #else
         for_each_tuple(data, [this](auto&& args) {

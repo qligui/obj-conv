@@ -31,6 +31,12 @@ struct HostTest: Host,Config
     REFLEX_BIND(O(other),I(Host, Config))
 };
 
+struct TupleVarData
+{
+    std::tuple<int, std::string, double> arr;
+    std::variant<int, double, std::string> var;
+    REFLEX_BIND(O(arr, var))
+};
 TEST_CASE("json_obj_test")
 {
     Host host;
@@ -76,6 +82,23 @@ TEST_CASE("json inherited class")
     REQUIRE(host222.mode == host.mode);
     REQUIRE(host222.url == host.url);
     REQUIRE(host222.other == host.other);
+}
+
+TEST_CASE("tuple and variant test")
+{
+    TupleVarData tuple_var_data;
+    tuple_var_data.arr = std::make_tuple(100, std::string("hello"), 10.24f);
+    tuple_var_data.var.emplace<1>(10.0f);
+    auto json_str = reflexjson::obj_to_json(tuple_var_data);
+    TupleVarData tv_data_2;
+    reflexjson::json_to_obj(json_str, tv_data_2);
+    REQUIRE(tv_data_2.arr == tuple_var_data.arr);
+    REQUIRE(tv_data_2.var == tuple_var_data.var);
+
+    tuple_var_data.var.emplace<2>("hello");
+    json_str = reflexjson::obj_to_json(tuple_var_data);
+    reflexjson::json_to_obj(json_str, tv_data_2);
+    REQUIRE(tv_data_2.var == tuple_var_data.var);
 }
 
 TEST_CASE("xml_obj_test")

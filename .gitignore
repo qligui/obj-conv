@@ -3,5 +3,5 @@
 ################################################################################
 
 /build/windows/x64/Debug
-/build/windows/.vs/obj-conv/v16
+/build/windows/.vs
 /x64/Debug
