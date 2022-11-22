@@ -6,10 +6,10 @@
 
 namespace reflexjson{
 template <typename _type>
-static bool json_to_obj(const std::string &str, _type &obj, bool isfile = false)
+static bool json_to_obj(const std::string& str, _type& obj, bool isfile = false)
 {
-    JsonReader reader(str, isfile);
-    return reader.convert(nullptr, obj);
+    JsonReader reader;
+    return reader.parse(str, isfile) ? reader.convert(nullptr, obj) : false;
 }
 //"indentCount = 0"  show json format. "indentChar" show split character
 template <typename _type>

@@ -2,6 +2,9 @@
 # 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
 ################################################################################
 
-/build/windows/x64/Debug
+/x64/
+/build/windows/x64/
 /build/windows/.vs
-/x64/Debug
+/build/windows/unit-test/x64
+*.runsettings
+/.vscode/
