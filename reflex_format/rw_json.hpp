@@ -64,10 +64,14 @@ private:
     const rapidjson::Value* val_;
     mutable std::shared_ptr<rapidjson::Value::ConstMemberIterator> iter_;
 public:
-    JsonReader(const std::string& str, bool isfile = false) :
-        reader_doc_tpye(nullptr, ""),
-        doc_(new rapidjson::Document()),
-        val_(doc_.get()) {
+    JsonReader() : reader_doc_tpye(nullptr, "")
+    {
+        doc_ = std::make_shared<rapidjson::Document>();
+        val_ = doc_.get();
+    }
+    ~JsonReader() { }
+    bool parse(const std::string& str, bool isfile = false)
+    {
         std::string err;
         std::string data;
         do {
@@ -75,38 +79,28 @@ public:
             {
                 std::ifstream fs(str.c_str(), std::ifstream::binary);
                 if (!fs) {
-                    err = "open file[" + str + "] fail.";
+                    err = "open file [" + str + "] fail";
                     break;
                 }
                 data = std::string((std::istreambuf_iterator<char>(fs)), std::istreambuf_iterator<char>());
-                doc_->Parse(data);
             }
-            else
-            {
-                doc_->Parse(str);
-            }
-
+            const std::string& json_str = isfile ? data : str;
+            doc_->Parse(json_str);
             if (doc_->HasParseError())
             {
                 size_t offset = doc_->GetErrorOffset();
-                if (isfile) {
-                    std::string err_info = data.substr(offset, offset + 32);
-                    err = "parse json file [" + str + "] fail. " + err_info;
-                    break;
-                }
-                else {
-                    std::string err_info = str.substr(offset, offset + 32);
-                    err = "parse json string [" + str + "] fail. " + err_info;
-                    break;
-                }
+                std::string err_info = json_str.substr(offset, offset + 32);
+                err = isfile ? "parse json file [" : "parse json string [";
+                err += (json_str + "] fail" + err_info);
+                break;
             }
-            return;
+            return true;
         } while (false);
 
         doc_.reset();
-        printf("error:%s\n", err.c_str());
+        printf("%s.\n", err.c_str());
+        return false;
     }
-    ~JsonReader() { }
 public:
 #define JSON_GETVAL(f, is_f, ...)                       \
         const rapidjson::Value* v = get_val(key);       \
@@ -429,7 +423,6 @@ public:
         return nullptr != val_;
     }
 private:
-    JsonReader() :reader_doc_tpye(0, ""), doc_(nullptr), val_(nullptr), iter_(nullptr) { }
     JsonReader(const rapidjson::Value* val, const JsonReader* parent, const char* key) :
         reader_doc_tpye(parent, key),
         doc_(nullptr),
