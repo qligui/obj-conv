@@ -33,6 +33,9 @@
     <ClInclude Include="..\..\reflex_format\rw_xml.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\reflex_format\rw_ini.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\thirdparty\tinyxml\tinyxml2.cpp">

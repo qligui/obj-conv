@@ -592,7 +592,7 @@ public:
             }, val);
         return *this;
     }
-    //add enum tpye check:https://stackoverflow.com/questions/9343329/how-to-know-underlying-type-of-class-enum
+    //add enum type check:https://stackoverflow.com/questions/9343329/how-to-know-underlying-type-of-class-enum
     template<typename _type, typename = std::enable_if_t<std::is_enum_v<_type>>>
     JsonWriter& convert(const char* key, const _type& val)
     {
@@ -656,7 +656,7 @@ public:
         }
         this->object_end();
     }
-    //add tuple tpye support https://en.cppreference.com/w/cpp/utility/apply
+    //add tuple type support https://en.cppreference.com/w/cpp/utility/apply
     template<typename... _type>
     void convert(const char* key, const std::tuple<_type...>& data)
     {

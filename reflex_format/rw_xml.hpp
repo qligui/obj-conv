@@ -18,14 +18,13 @@ using namespace reflextraits;
 class RWriter
 {
 public:
-    RWriter() { }
     RWriter(bool attribute = false) :attribute_(attribute) { }
-    ~RWriter() { }
+
 protected:
     std::stack<XMLNode*> stack_node_;
-    XMLNode* root_;
-    const char* key_;
-    bool attribute_;
+    XMLNode* root_{nullptr};
+    const char* key_{nullptr};
+    bool attribute_{false};
 
 protected:
     XMLNode* get_current_node()

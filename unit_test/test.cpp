@@ -162,3 +162,39 @@ TEST_CASE("XMLTestSet.Test01.xml_obj_test")
 {
     REQUIRE(2 == 2);
 }
+//ini demo
+struct OrgParam
+{
+    std::string ip;
+    uint16_t port;
+    REFLEX_BIND(O(ip, port))
+};
+struct ConfigParam
+{
+    int id;
+    std::string name;
+    std::string mail;
+    OrgParam param;
+    REFLEX_BIND(A(id, "card_id"), A(param, "address"), O(name, mail))
+};
+TEST_CASE("iniTestSet.Test01.ini_to_obj")
+{
+    namespace fs = std::filesystem;
+    std::string path = "./example.ini";
+    ConfigParam conf;
+    conf.id = 12345;
+    conf.name = "xxxx";
+    conf.mail = "xxxx@gmail.com";
+    conf.param.ip = "127.0.0.1";
+    conf.param.port = 8080;
+    REQUIRE(reflexini::obj_to_save_ini(path.c_str(), conf));
+
+    decltype(conf) conf_2;
+    REQUIRE(reflexini::ini_to_obj(path.c_str(), conf_2));
+    CHECK(conf.id == conf_2.id);
+    CHECK(conf.name == conf_2.name);
+    CHECK(conf.mail == conf_2.mail);
+    CHECK(conf.param.ip == conf_2.param.ip);
+    CHECK(conf.param.port == conf_2.param.port);
+    fs::remove(path);
+}

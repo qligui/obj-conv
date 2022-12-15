@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\reflex_format\reflex_format.hpp" />
+    <ClInclude Include="..\..\reflex_format\rw_ini.hpp" />
     <ClInclude Include="..\..\reflex_format\rw_json.hpp" />
     <ClInclude Include="..\..\reflex_format\rw_traits_type.hpp" />
     <ClInclude Include="..\..\reflex_format\rw_xml.hpp" />
@@ -53,7 +54,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">

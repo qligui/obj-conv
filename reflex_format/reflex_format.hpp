@@ -3,6 +3,7 @@
 
 #include "rw_json.hpp"
 #include "rw_xml.hpp"
+#include "rw_ini.hpp"
 
 namespace reflexjson{
 template <typename _type>
@@ -44,6 +45,22 @@ static bool obj_to_save_xml_file(const char *filename, const _type &data, const 
 }
 }  // reflexxml
 
+namespace reflexini{
+template<typename _type>
+static bool ini_to_obj(const std::string& filename, _type& data)
+{
+    IniReader ini_reader;
+    ini_reader.parse(filename.c_str());
+    return ini_reader.convert(nullptr, data);
+}
+template<typename _type>
+static bool obj_to_save_ini(const char* filename, const _type& data)
+{
+    IniWriter ini_writer;
+    ini_writer.convert(nullptr, data);
+    return ini_writer.obj_to_ini(filename);
+}
+}
 //"##NAME" as front join. "NAME##" as back json
 /******************************************macro meta program*****************************************/
 #define STRUCT_FUNC_COMMON                                          \

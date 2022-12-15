@@ -1,6 +1,10 @@
 ﻿#include <iostream>
 #include <vector>
 #include "reflex_format/reflex_format.hpp"
+
+//#define XML_CONVERT
+//#define JSON_CONVERT
+#define INI_CONVERT
 /*
  *A:key 取别名
  *O:建立映射关系
@@ -28,7 +32,7 @@ struct Worker : public Company
     std::string address;
     REFLEX_BIND(I(Company), O(address))
 };
-
+void ini_demo();
 /*
 struct User
 {
@@ -101,13 +105,14 @@ int main(int argc, char* argv[])
     compay.members[0] = User(1, "xxxxx", "xxx@gmail.com");
     compay.members[1] = User(2, "yyyyyy", "yyy@gmail.com");
     compay.person = User(1, "zzzzzz", "zzz@gmail.com");
-#if 0
+#ifdef XML_CONVERT
     auto xml_str = reflexxml::obj_to_xml(compay, "config");
     reflexxml::obj_to_save_xml_file("./example.xml", compay, "config");
     std::cout << xml_str << std::endl;
     Company cmpy2;
     reflexxml::xml_to_obj("./example.xml", cmpy2, false, true);
-#else
+#endif
+#ifdef JSON_CONVERT
     auto json_str = reflexjson::obj_to_json(compay);
     //std::cout << json_str << std::endl;
     json_str = "{\"name\":\"cg\",\"master\":2020, \"members\":[{\"card_id\":1,\"name\":\"xxxxx\",\"mail\":\"xxx@gmail.com\"},"
@@ -121,7 +126,37 @@ int main(int argc, char* argv[])
     {
         printf("%s.", e.what());
     }
-
 #endif
-    getchar();
+    ini_demo();
+    system("pause");
+}
+//ini demo
+struct OrgParam
+{
+    std::string ip;
+    uint16_t port;
+    REFLEX_BIND(O(ip, port))
+};
+struct ConfigParam
+{
+    int id;
+    std::string name;
+    std::string mail;
+    OrgParam param;
+    REFLEX_BIND(A(id, "card_id"),A(param, "address"), O(name, mail))
+};
+void ini_demo()
+{
+#ifdef INI_CONVERT
+    std::string path = "./example.ini";
+    ConfigParam conf;
+    conf.id = 12345;
+    conf.name = "xxxx";
+    conf.mail = "xxxx@gmail.com";
+    conf.param.ip = "127.0.0.1";
+    conf.param.port = 8080;
+
+    reflexini::obj_to_save_ini(path.c_str(), conf);
+    reflexini::ini_to_obj(path.c_str(), conf);
+#endif
 }
