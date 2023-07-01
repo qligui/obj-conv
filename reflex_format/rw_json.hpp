@@ -346,23 +346,6 @@ public:
             val.obj_to_struct(*obj);
             bret = true;
         }
-        else if (nullptr == val.cond_t_.cond_func_)
-        {
-            return bret;
-        }
-        else {
-            for (size_t i = 0; i < len; ++i)
-            {
-                JsonReader sub = (*obj)[i];
-                if (val.cond_t_.cond_func_(val.cond_t_.parent_, (void*)&sub))
-                {
-                    val.obj_to_struct(sub);
-                    bret = true;
-                    break;
-                }
-            }
-        }
-        val.cond_t_.set_value(nullptr, nullptr);
         return bret;
     }
 

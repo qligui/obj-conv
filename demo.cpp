@@ -18,7 +18,8 @@ struct User
     User(int64_t i = 0, const string& n = "", const string& m = "") :id(i), name(n), mail(m) {}
     REFLEX_BIND(A(id, "card_id"), O(name, mail))
 };
-struct Company {
+struct Company 
+{
     std::string  name;
     int64_t master;
     std::vector<User> members;
